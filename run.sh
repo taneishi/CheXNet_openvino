@@ -4,7 +4,6 @@
 #PBS -j oe
 #PBS -o log/output.log
 
-cd ${PBS_O_WORKDIR}
-mkdir -p model log
+if [ ${PBS_O_WORKDIR} ]; then cd ${PBS_O_WORKDIR}; fi
 
 python main.py

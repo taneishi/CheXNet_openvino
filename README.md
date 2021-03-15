@@ -1,20 +1,28 @@
 # Classification and Localization of Thoracic Diseases in PyTorch
 
-This is a Python3 (Pytorch) reimplementation of [CheXNet](https://stanfordmlgroup.github.io/projects/chexnet/).
+This is a PyTorch reimplementation of [CheXNet](https://stanfordmlgroup.github.io/projects/chexnet/).
+
 The model takes a chest X-ray image as input and outputs the probability of each thoracic disease along with a likelihood map of pathologies.
 
 <div align=center><img width="300" src="./localization/00008473_011-3.png"/></div>
 
 ## Dataset
 
-The [ChestX-ray14 dataset](http://openaccess.thecvf.com/content_cvpr_2017/papers/Wang_ChestX-ray8_Hospital-Scale_Chest_CVPR_2017_paper.pdf) comprises 112,120 frontal-view chest X-ray images of 30,805 unique patients with 14 disease labels. To evaluate the model, we randomly split the dataset into training (70%), validation (10%) and test (20%) sets, following the work in paper. Partitioned image names and corresponding labels are placed under the directory [labels](./ChestX-ray14/labels).
+The [ChestX-ray14 dataset](http://openaccess.thecvf.com/content_cvpr_2017/papers/Wang_ChestX-ray8_Hospital-Scale_Chest_CVPR_2017_paper.pdf) 
+comprises 112,120 frontal-view chest X-ray images of 30,805 unique patients with 14 disease labels. 
+To evaluate the model, we randomly split the dataset into training (70%), validation (10%) and test (20%) sets, following the work in paper. 
+Partitioned image names and corresponding labels are placed under the directory [labels](./ChestX-ray14/labels).
 
 ## Prerequisites
 
-- Python 3.4+
+- Python 3.7+
+    - Anaconda3-2020.11
 - [PyTorch](http://pytorch.org/) and its dependencies
+    - conda install -c conda-forge pytorch torchvision
+- scikit-learn
+    - conda install -c conda-forge scikit-learn
 - OpenVINO
-- pip install onnx
+    - conda install -c intel openvino-ie4py-ubuntu20
 
 ## Usage
 
@@ -52,6 +60,8 @@ We have also proposed a slightly-improved model which achieves a mean ROC-AUC of
 ## Contributors
 
 This work was collaboratively conducted by Xinyu Weng, Nan Zhuang, Jingjing Tian and Yingcheng Liu.
+
+OpenVINO acceleration was proposed by Hiroshi Ouchiyama (Intel), and evaluated on Intel DevCloud by Kei Taneishi.
 
 ## Original Team
 

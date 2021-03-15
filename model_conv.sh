@@ -4,11 +4,10 @@
 #PBS -j oe
 #PBS -o log/output_conv.log
 
-cd ${PBS_O_WORKDIR}
-mkdir -p model log
+if [ ${PBS_O_WORKDIR} ]; then cd ${PBS_O_WORKDIR}; fi
 
 # l_openvino_toolkit_p_2019.3.376.tgz
-source ${PBS_O_HOME}/intel/openvino/bin/setupvars.sh
+#source ${PBS_O_HOME}/intel/openvino/bin/setupvars.sh
 
 # fp32 model optimization
 python ${INTEL_OPENVINO_DIR}/deployment_tools/model_optimizer/mo_onnx.py \
@@ -16,7 +15,7 @@ python ${INTEL_OPENVINO_DIR}/deployment_tools/model_optimizer/mo_onnx.py \
 
 mkdir -p annotations
 
-source activate pytorch
+#source activate pytorch
 
 python annotation.py chest_xray --annotation_file labels/val_list.txt -ss 200 \
     -o annotations -a chestx.pickle -m chestx.json --data_dir images

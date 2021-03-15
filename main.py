@@ -5,13 +5,13 @@ from torch.utils.data import DataLoader
 from sklearn.metrics import roc_auc_score
 import argparse
 import timeit
-import os
 
 from read_data import ChestXrayDataSet
 from model import DenseNet121, CLASS_NAMES, N_CLASSES
 
 DATA_DIR = './images'
-TEST_IMAGE_LIST = './labels/test_list.txt'
+#TEST_IMAGE_LIST = './labels/test_list.txt'
+TEST_IMAGE_LIST = './labels/bmt_list.txt'
 
 def main(args):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -23,11 +23,8 @@ def main(args):
     if torch.cuda.device_count() > 1:
         net = torch.nn.DataParallel(net).to(device)
 
-    if os.path.isfile(args.model_path):
-        net.load_state_dict(torch.load(args.model_path, map_location=device))
-        print('model state has loaded')
-    else:
-        print('=> model state file not found')
+    net.load_state_dict(torch.load(args.model_path, map_location=device))
+    print('model state has loaded')
 
     normalize = transforms.Normalize(
             [0.485, 0.456, 0.406],
@@ -67,21 +64,10 @@ def main(args):
             
         print('batch %03d/%03d %6.3fsec' % (index, len(test_loader), (timeit.default_timer() - start_time)))
 
-    torch.onnx.export(net,
-            data, 'model/densenet121.onnx',
-            export_params=True,
-            do_constant_folding=True,
-            input_names=['input'],
-            output_names=['output'],
-            dynamic_axes={
-                'input': {0 : 'batch_size'},
-                'output': {0: 'batch_size'}},
-            verbose=False)
-    print('ONNX model exported.')
-
-    AUCs = [roc_auc_score(gt.cpu()[:, i], pred.cpu()[:, i]) for i in range(N_CLASSES)]
-    AUC_avg = np.mean(AUCs)
-    print('The average AUC is %6.3f' % AUC_avg)
+    AUCs = []
+    for i in range(N_CLASSES):
+        AUCs.append(roc_auc_score(gt.cpu()[:, i], pred.cpu()[:, i]))
+    print('The average AUC is %6.3f' % np.mean(AUCs))
 
     for i in range(N_CLASSES):
         print('The AUC of %s is %6.3f' % (CLASS_NAMES[i], AUCs[i]))
@@ -90,6 +76,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_path', default='model/model.pth', type=str)
     parser.add_argument('--batch_size', default=32, type=int)
-    args = parser.parse_args()
+    args = parser.parse_args([])
 
     main(args)

@@ -2,8 +2,21 @@ import torch.nn as nn
 import torchvision
 
 N_CLASSES = 14
-CLASS_NAMES = ['Atelectasis', 'Cardiomegaly', 'Effusion', 'Infiltration', 'Mass', 'Nodule', 'Pneumonia',
-        'Pneumothorax', 'Consolidation', 'Edema', 'Emphysema', 'Fibrosis', 'Pleural_Thickening', 'Hernia']
+CLASS_NAMES = [
+        'Atelectasis',
+        'Cardiomegaly',
+        'Effusion',
+        'Infiltration',
+        'Mass',
+        'Nodule',
+        'Pneumonia',
+        'Pneumothorax',
+        'Consolidation',
+        'Edema',
+        'Emphysema',
+        'Fibrosis',
+        'Pleural_Thickening',
+        'Hernia']
 
 class DenseNet121(nn.Module):
     def __init__(self, out_size):
