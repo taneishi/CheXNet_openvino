@@ -6,4 +6,6 @@
 
 if [ ${PBS_O_WORKDIR} ]; then cd ${PBS_O_WORKDIR}; fi
 
+source activate torch
+
 python main.py
