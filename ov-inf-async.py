@@ -98,7 +98,7 @@ class InferRequestsQueue:
         self.cv.release()
 
 DATA_DIR = './images'
-TEST_IMAGE_LIST = './labels/bmt_list.txt'
+TEST_IMAGE_LIST = './labels/test_list.txt'
 BATCH_SIZE = 32
 N_CROPS = 10
 NUM_REQUESTS=8
@@ -208,6 +208,6 @@ if __name__ == '__main__':
     if args.fp32:
         main(modelfile='densenet121.xml')
     elif args.int8:
-        main(modelfile='densenet121_i8.xml')
+        main(modelfile='chexnet-pytorch.xml')
     else:
         parser.print_help()

@@ -13,7 +13,7 @@ from read_data import ChestXrayDataSet
 from model import CLASS_NAMES, N_CLASSES
 
 DATA_DIR = './images'
-TEST_IMAGE_LIST = './labels/bmt_list.txt'
+TEST_IMAGE_LIST = './labels/test_list.txt'
 
 N_CROPS = 10
 
@@ -98,6 +98,6 @@ if __name__ == '__main__':
     if args.fp32:
         main(modelfile='densenet121.xml')
     elif args.int8:
-        main(modelfile='densenet121_i8.xml')
+        main(modelfile='chexnet-pytorch.xml')
     else:
         parser.print_help()
