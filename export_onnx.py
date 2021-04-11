@@ -1,7 +1,6 @@
 import torch
 import argparse
 import os
-
 from model import DenseNet121, CLASS_NAMES, N_CLASSES
 
 def main(args):
@@ -23,14 +22,8 @@ def main(args):
     dummy_input = torch.randn(args.batch_size, 3, 224, 224)
     torch_out = model(dummy_input)
     torch.onnx.export(model,
-            dummy_input, 'model/densenet121.onnx',
-            export_params=True,
-            do_constant_folding=True,
-            input_names=['input'],
-            output_names=['output'],
-            dynamic_axes={
-                'input': {0 : 'batch_size'},
-                'output': {0: 'batch_size'}},
+            dummy_input,
+            'model/densenet121.onnx',
             verbose=False)
     print('ONNX model exported.')
 
