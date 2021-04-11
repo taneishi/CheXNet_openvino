@@ -15,10 +15,15 @@ ${PYTHON} ${INTEL_OPENVINO_DIR}/deployment_tools/model_optimizer/mo.py \
 
 mkdir -p annotations
 
+# make annotations
 ${PYTHON} annotation.py chest_xray --annotation_file labels/val_list.txt -ss 200 \
     -o annotations -a chestx.pickle -m chestx.json --data_dir images
 
+# accuracy check
+accuracy_check -c config/chestx.yaml -m model -a annotations
+
+# benchmark
+${PYTHON} ${INTEL_OPENVINO_DIR}/deployment_tools/tools/benchmark_tool/benchmark_app.py -m model/densenet121.xml
+
 # int8 quantization
-${PYTHON} calibrate.py --config config/chestx.yml -d config/def.yml \
-    -M ${INTEL_OPENVINO_DIR}/deployment_tools/model_optimizer \
-    --models model --annotations annotations --batch_size 64
+pot -c config/chestx.yaml -e
