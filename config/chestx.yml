@@ -23,6 +23,7 @@ models:
             aspect_ratio_scale: greater
             use_pillow: True
             interpolation: BILINEAR
+
           - type: crop
             size: 224
             use_pillow: True
