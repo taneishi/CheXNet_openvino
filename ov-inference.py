@@ -23,17 +23,14 @@ def main(modelfile):
 
     log.info('Creating Inference Engine')
     ie = IECore()
-    net = IENetwork(model=model_xml, weights=model_bin) 
-    #net = ie.read_network(model=model_xml, weights=model_bin)
+    net = ie.read_network(model=model_xml, weights=model_bin)
 
     log.info('Preparing input blobs')
-    #input_blob = next(iter(net.input_info))
-    input_blob = next(iter(net.inputs))
+    input_blob = next(iter(net.input_info))
     out_blob = next(iter(net.outputs))
     net.batch_size = (args.batch_size * N_CROPS)
 
-    #n, c, h, w = net.input_info[input_blob].input_data.shape
-    n, c, h, w = net.inputs[input_blob].shape
+    n, c, h, w = net.input_info[input_blob].input_data.shape
 
     # for image load
     normalize = transforms.Normalize(
