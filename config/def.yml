@@ -1,5 +1,0 @@
-datasets:
-  - name: chestX-ray14
-    annotation: chestx.pickle
-    dataset_meta: chestx.json
-    metrics: multi_accuracy
