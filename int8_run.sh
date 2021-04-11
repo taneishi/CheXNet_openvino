@@ -4,10 +4,10 @@
 #PBS -j oe
 #PBS -o log/output_int8.log
 
-cd ${PBS_O_WORKDIR}
-mkdir -p model log
+if [ $(which python) ]; then PYTHON=python; fi
+if [ $(which python3) ]; then PYTHON=python3; fi
 
-source ${PBS_O_HOME}/intel/openvino/bin/setupvars.sh
+if [ ${PBS_O_WORKDIR} ]; then cd ${PBS_O_WORKDIR}; fi
 
-python ov-inference.py --int8
-python ov-inf-async.py --int8
+${PYTHON} ov-inference.py --int8
+${PYTHON} ov-inf-async.py --int8
