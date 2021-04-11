@@ -28,7 +28,7 @@ for index, link in enumerate(links, 1):
 
 print('Download complete. Please check the checksums')
 
-sha256sum = [
+sha256sums = [
         'fd8e3542db6351ae9377779033f5d5c5f32fe50eb0830b519fbf1a7e791354b1',
         'c849cfa5504b8cffb301952bf93d53d3d39d7d931bc88bb70427b4a67de0740a',
         '6a90a979850545e30ed3e9ba96de2f063db13aa2a3c22363820d3f70d8c882c8',
@@ -42,4 +42,5 @@ sha256sum = [
         '7e7d190f71b5b792c495acb2eebbbf0563a8c528adb23e9335ec3b79cb5b486f',
         '7316ce5f4d5e0154730e592cc2b45b48a2bee8457f6339d36c2ca55ed6e60b26',
         ]
-print(sha256sum)
+for i, sha256sum in enumerate(sha256sums, 1):
+    print('images_%02d.tar.gz sha256sum is %s' % (i, sha256sum))
