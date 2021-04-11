@@ -10,8 +10,8 @@ if [ $(which python3) ]; then PYTHON=python3; fi
 if [ ${PBS_O_WORKDIR} ]; then cd ${PBS_O_WORKDIR}; fi
 
 # fp32 model optimization
-${PYTHON} ${INTEL_OPENVINO_DIR}/deployment_tools/model_optimizer/mo_onnx.py \
-    --input_model ${PWD}/model/densenet121.onnx --data_type=FP32 --batch 1 --output_dir model
+${PYTHON} ${INTEL_OPENVINO_DIR}/deployment_tools/model_optimizer/mo.py \
+    --input_model ${PWD}/model/densenet121.onnx --output_dir model
 
 mkdir -p annotations
 
