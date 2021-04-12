@@ -15,14 +15,8 @@ Partitioned image names and corresponding labels are placed under the directory 
 
 ## Prerequisites
 
-- Python 3.7+
-    - Anaconda3-2020.11
-- [PyTorch](http://pytorch.org/) and its dependencies
-    - conda install -c conda-forge pytorch torchvision
-- scikit-learn
-    - conda install -c conda-forge scikit-learn
 - OpenVINO
-    - conda install -c intel openvino-ie4py-ubuntu20
+    - docker run -it --rm -v ${HOME}/CheXNet:/CheXNet openvino/ubuntu18_dev:2021.2 /bin/bash 
 
 ## Usage
 
