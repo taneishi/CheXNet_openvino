@@ -5,7 +5,7 @@
         "weights": "./model/densenet121.bin"
     },
     "engine": {
-        "config": "./config/chestx.yml"
+        "config": "./config/chestx.yaml"
     },
     "compression": {
         "algorithms": [
