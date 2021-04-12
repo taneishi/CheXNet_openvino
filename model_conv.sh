@@ -16,14 +16,15 @@ ${PYTHON} ${INTEL_OPENVINO_DIR}/deployment_tools/model_optimizer/mo.py \
 mkdir -p annotations
 
 # make annotations
-${PYTHON} annotation.py chest_xray --annotation_file labels/val_list.txt -ss 200 \
-    -o annotations -a chestx.pickle -m chestx.json --data_dir images
+#${PYTHON} annotation.py chest_xray --annotation_file labels/val_list.txt -ss 200 \
+#    -o annotations -a chestx.pickle -m chestx.json --data_dir images
 
 # accuracy check
 accuracy_check -c config/chestx.yaml -m model
 
-# benchmark
-${PYTHON} ${INTEL_OPENVINO_DIR}/deployment_tools/tools/benchmark_tool/benchmark_app.py -m model/densenet121.xml
-
 # int8 quantization
 pot -c config/chexnet_int8.json -e
+
+# benchmark
+${PYTHON} ${INTEL_OPENVINO_DIR}/deployment_tools/tools/benchmark_tool/benchmark_app.py -m model/densenet121.xml
+${PYTHON} ${INTEL_OPENVINO_DIR}/deployment_tools/tools/benchmark_tool/benchmark_app.py -m $(ls results/chexnet-pytorch_DefaultQuantization/*/optimized/chexnet-pytorch.xml | tail -1)

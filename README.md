@@ -16,7 +16,7 @@ Partitioned image names and corresponding labels are placed under the directory 
 ## Prerequisites
 
 - OpenVINO
-    - docker run -it --rm -v ${HOME}/CheXNet:/CheXNet openvino/ubuntu18_dev:2021.2 /bin/bash 
+    - docker run -it --rm -v ${HOME}/CheXNet:/CheXNet openvino/ubuntu20_dev:2021.3
 
 ## Usage
 
