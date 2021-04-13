@@ -35,7 +35,7 @@ We followed the training strategy described in the official paper, and a ten cro
 Compared with the original CheXNet, the per-class ROC-AUC of our reproduced model is almost the same.
 We have also proposed a slightly-improved model which achieves a mean ROC-AUC of 0.847 (v.s. 0.841 of the original CheXNet).
 
-|     Pathology      | [Wang et al.](https://arxiv.org/abs/1705.02315) | [Yao et al.](https://arxiv.org/abs/1710.10501) | [CheXNet](https://arxiv.org/abs/1711.05225) | CheXNet | Improved Model |
+|     Pathology      | [Wang et al.](https://arxiv.org/abs/1705.02315) | [Yao et al.](https://arxiv.org/abs/1710.10501) | [CheXNet](https://arxiv.org/abs/1711.05225) | CheXNet PyTorch | Improved Model |
 | :----------------: | :-----: | :-----: | :------: | :------: | :------: |
 |    Atelectasis     |  0.716  |  0.772  |  0.8094  |  0.8294  |  0.8311  |
 |    Cardiomegaly    |  0.807  |  0.904  |  0.9248  |  0.9165  |  0.9220  |
