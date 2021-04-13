@@ -1,10 +1,10 @@
 import numpy as np
 from sklearn.metrics import roc_auc_score
-import logging as log
-from openvino.inference_engine import IENetwork, IECore
 import torch
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
+from openvino.inference_engine import IECore
+import logging as log
 import argparse
 import timeit
 import os
@@ -54,7 +54,6 @@ def main(modelfile):
     
     # loading model to the plugin
     log.info('Loading model to the plugin')
-    #exec_net = ie.load_network(network=net, device_name='CPU', config={'DYN_BATCH_ENABLED': 'YES'})
     exec_net = ie.load_network(network=net, device_name='CPU')
 
     for index, (data, target) in enumerate(test_loader):
