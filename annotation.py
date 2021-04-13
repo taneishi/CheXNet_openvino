@@ -35,30 +35,21 @@ class ChestXRayConverter(FileBasedAnnotationConverter):
             annotations: list of annotation representation objects.
             meta: dictionary with additional dataset level metadata (if provided)
         '''
-
-        dataset_directory = get_path(self.data_dir, is_directory=True)
-
         # read and convert annotation
         image_list_file = os.path.join('labels', 'val_list.txt')
-        images_dir = os.path.join(str(dataset_directory), 'images')
         
-        image_names = []
-        labels = []
         annotations= []
         with open(image_list_file, 'r') as f:
             for line in f:
                 items = line.split()
                 image_name = items[0]
-                label = items[1:]
-                label = [int(i) for i in label]
+                label = [int(i) for i in items[1:]]
                 annotations.append(MultiLabelRecognitionAnnotation(image_name, label))
-                image_names.append(image_name)
-                labels.append(label)
         return ConverterReturn(annotations, self.generate_meta(CLASS_NAMES), None)
 
     @staticmethod
     def generate_meta(labels):
-        return {'label_map': {value: key for value,key in enumerate(labels)}}
+        return {'label_map': {value: key for value, key in enumerate(labels)}}
 
 if __name__ == '__main__':
     main()

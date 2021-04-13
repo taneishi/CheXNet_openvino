@@ -5,7 +5,7 @@ models:
       - framework: dlsdk
         device: CPU
 
-        model:   densenet121.xml
+        model: densenet121.xml
         weights: densenet121.bin
         #adapter: chest_xray
         adapter: person_attributes
