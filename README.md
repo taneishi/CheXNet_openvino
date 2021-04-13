@@ -1,4 +1,4 @@
-# CheXNet acceleration and quantization using OpenVINO
+# Optimization and Quantization CheXNet using OpenVINO
 
 ## CheXNet - Classification and Localization of Thoracic Diseases
 
