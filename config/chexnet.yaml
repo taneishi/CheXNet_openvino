@@ -4,8 +4,7 @@ models:
     launchers:
       - framework: dlsdk
         device: CPU
-        tags:
-          - FP32
+
         model:   densenet121.xml
         weights: densenet121.bin
         #adapter: chest_xray
