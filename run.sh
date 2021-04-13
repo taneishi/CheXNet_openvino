@@ -9,11 +9,13 @@ if [ $(which python3) ]; then PYTHON=python3; fi
 
 if [ ${PBS_O_WORKDIR} ]; then cd ${PBS_O_WORKDIR}; fi
 
-${PYTHON} main.py
+${PYTHON} ${INTEL_OPENVINO_DIR}/deployment_tools/tools/benchmark_tool/benchmark_app.py -m model/densenet121.onnx
 
 # fp32 model optimization
 ${PYTHON} ${INTEL_OPENVINO_DIR}/deployment_tools/model_optimizer/mo.py \
     --input_model ${PWD}/model/densenet121.onnx --output_dir model
+
+${PYTHON} ${INTEL_OPENVINO_DIR}/deployment_tools/tools/benchmark_tool/benchmark_app.py -m model/densenet121.xml
 
 mkdir -p annotations
 
@@ -27,6 +29,4 @@ accuracy_check -c config/chexnet.yaml -m model
 # int8 quantization
 pot -c config/chexnet_int8.json -e
 
-# benchmark
-${PYTHON} ${INTEL_OPENVINO_DIR}/deployment_tools/tools/benchmark_tool/benchmark_app.py -m model/densenet121.xml
-${PYTHON} ${INTEL_OPENVINO_DIR}/deployment_tools/tools/benchmark_tool/benchmark_app.py -m $(ls results/chexnet-pytorch_DefaultQuantization/*/optimized/chexnet-pytorch.xml | tail -1)
+${PYTHON} ${INTEL_OPENVINO_DIR}/deployment_tools/tools/benchmark_tool/benchmark_app.py -m $(ls -t results/*/*/optimized/chexnet-pytorch.xml | head -1)
