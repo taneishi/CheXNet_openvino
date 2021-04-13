@@ -10,4 +10,3 @@ if [ $(which python3) ]; then PYTHON=python3; fi
 if [ ${PBS_O_WORKDIR} ]; then cd ${PBS_O_WORKDIR}; fi
 
 ${PYTHON} ov-inference.py --fp32
-${PYTHON} ov-inf-async.py --fp32
