@@ -27,6 +27,6 @@ ${PYTHON} annotation.py chest_xray --annotation_file labels/val_list.txt -ss 200
 accuracy_check -c config/chexnet.yaml -m model
 
 # int8 quantization
-pot -c config/chexnet_int8.json -e
+pot -c config/chexnet_int8.yaml -e
 
 ${PYTHON} ${INTEL_OPENVINO_DIR}/deployment_tools/tools/benchmark_tool/benchmark_app.py -m $(ls -t results/*/*/optimized/chexnet-pytorch.xml | head -1)

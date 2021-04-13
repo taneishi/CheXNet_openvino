@@ -1,4 +1,6 @@
-# Classification and Localization of Thoracic Diseases in PyTorch
+# CheXNet acceleration and quantization using OpenVINO
+
+## CheXNet - Classification and Localization of Thoracic Diseases
 
 This is a PyTorch reimplementation of [CheXNet](https://stanfordmlgroup.github.io/projects/chexnet/).
 
