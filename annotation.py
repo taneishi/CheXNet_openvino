@@ -49,7 +49,7 @@ class ChestXRayConverter(FileBasedAnnotationConverter):
 
     @staticmethod
     def generate_meta(labels):
-        return {'label_map': {value: key for value, key in enumerate(labels)}}
+        return {'label_map': {value:key for value,key in enumerate(labels)}}
 
 if __name__ == '__main__':
     main()

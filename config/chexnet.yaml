@@ -7,7 +7,7 @@ models:
 
         model: densenet121.xml
         weights: densenet121.bin
-        #adapter: chest_xray
+        #adapter: adapters/chest_xray.py
         adapter: person_attributes
 
     datasets:
