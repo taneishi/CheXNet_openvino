@@ -56,7 +56,7 @@ We have also proposed a slightly-improved model which achieves a mean ROC-AUC of
 
 This work was collaboratively conducted by Xinyu Weng, Nan Zhuang, Jingjing Tian and Yingcheng Liu.
 
-OpenVINO acceleration was proposed by Hiroshi Ouchiyama (Intel), and evaluated on Intel DevCloud by Kei Taneishi.
+OpenVINO optimization and quantization were performed by Hiroshi Ouchiyama (Intel) and Kei Taneishi. The model was evaluated on Intel DevCloud for the Edge.
 
 ## Original Team
 
