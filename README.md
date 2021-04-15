@@ -6,7 +6,7 @@ This is a PyTorch reimplementation of [CheXNet](https://stanfordmlgroup.github.i
 
 The model takes a chest X-ray image as input and outputs the probability of each thoracic disease along with a likelihood map of pathologies.
 
-<div align=center><img width="300" src="./localization/00008473_011-3.png"/></div>
+<div align=center><img width="200" src="./localization/00008473_011-3.png"/></div>
 
 ## Dataset
 
