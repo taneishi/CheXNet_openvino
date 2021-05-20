@@ -25,7 +25,7 @@ Partitioned image names and corresponding labels are placed under the directory 
 
 2. Download images of ChestX-ray14 from this [released page](https://nihcc.app.box.com/v/ChestXray-NIHCC) and decompress them to the directory [images](./ChestX-ray14/images).
 
-3. docker run -it --rm -v ${HOME}/CheXNet:/CheXNet openvino/ubuntu18_dev:2021.2
+3. docker run -it --rm -v ${HOME}/CheXNet:/CheXNet openvino/ubuntu20_dev:2021.3
 
 4. `cd /CheXNet; bash run.sh`
 
