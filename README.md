@@ -6,7 +6,7 @@ This is a PyTorch reimplementation of [CheXNet](https://stanfordmlgroup.github.i
 
 The model takes a chest X-ray image as input and outputs the probability of each thoracic disease along with a likelihood map of pathologies.
 
-<div align=center><img width="300" src="./localization/00008473_011-3.png"/></div>
+<div align=center><img width="200" src="./localization/00008473_011-3.png"/></div>
 
 ## Dataset
 
@@ -56,7 +56,7 @@ We have also proposed a slightly-improved model which achieves a mean ROC-AUC of
 
 This work was collaboratively conducted by Xinyu Weng, Nan Zhuang, Jingjing Tian and Yingcheng Liu.
 
-OpenVINO acceleration was proposed by Hiroshi Ouchiyama (Intel), and evaluated on Intel DevCloud by Kei Taneishi.
+OpenVINO optimization and quantization were performed by Hiroshi Ouchiyama (Intel) and Kei Taneishi. The model was evaluated on Intel DevCloud for the Edge.
 
 ## Original Team
 
