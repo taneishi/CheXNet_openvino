@@ -54,7 +54,7 @@ def main(modelfile):
     
     # loading model to the plugin
     log.info('Loading model to the plugin')
-    exec_net = ie.load_network(network=net, device_name='CPU')
+    exec_net = ie.load_network(network=net, device_name='CPU', config={'DYN_BATCH_ENABLED': 'YES'})
 
     for index, (data, target) in enumerate(test_loader):
         start_time = timeit.default_timer()
