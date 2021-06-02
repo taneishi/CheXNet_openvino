@@ -31,4 +31,4 @@ pot -c config/chexnet_int8_pot.yaml -e
 accuracy_check -c config/chexnet_int8.yaml -m model
 
 # benchmark
-${PYTHON} ${INTEL_OPENVINO_DIR}/deployment_tools/tools/benchmark_tool/benchmark_app.py -m $(ls -t results/*/*/optimized/chexnet-pytorch.xml | head -1) -i images
+${PYTHON} ${INTEL_OPENVINO_DIR}/deployment_tools/tools/benchmark_tool/benchmark_app.py -m model/chexnet-pytorch.xml -i images
