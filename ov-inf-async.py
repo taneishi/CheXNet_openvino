@@ -16,10 +16,9 @@ from datetime import datetime
 import threading
 
 DATA_DIR = './images'
-TEST_IMAGE_LIST = './labels/test_list.txt'
+TEST_IMAGE_LIST = './labels/bmt_list.txt'
 
 N_CROPS = 10
-NUM_REQUESTS=8
 
 # for async
 #from openvino.tools.benchmark.utils.infer_request_wrap import InferRequestsQueue
@@ -133,7 +132,7 @@ def main(modelfile):
                 (lambda crops: torch.stack([normalize(crop) for crop in crops]))
                 ]))
     
-    test_loader = DataLoader(dataset=test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=10, pin_memory=False)
+    test_loader = DataLoader(dataset=test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=False)
 
     gt = torch.FloatTensor()
     pred = torch.FloatTensor()
@@ -142,8 +141,8 @@ def main(modelfile):
     log.info('Loading model to the plugin')
 
     #config = {'CPU_THREADS_NUM': '48', 'CPU_THROUGHPUT_STREAMS': 'CPU_THROUGHPUT_AUTO'}
-    config = {'CPU_THROUGHPUT_STREAMS': '8'}
-    exec_net = ie.load_network(network=net, device_name='CPU', config=config, num_requests=NUM_REQUESTS)
+    config = {'CPU_THROUGHPUT_STREAMS': '%d' % args.cpu_throughput_streams}
+    exec_net = ie.load_network(network=net, device_name='CPU', config=config, num_requests=args.num_requests)
 
     # Number of requests
     infer_requests = exec_net.requests
@@ -153,9 +152,6 @@ def main(modelfile):
     start_time = timeit.default_timer()
 
     for i, (inp, target) in enumerate(test_loader):
-        start_time = timeit.default_timer()
-
-        # gt = torch.cat((gt, target), 0)
         bs, n_crops, c, h, w = inp.size()
 
         images = inp.view(-1, c, h, w).numpy()
@@ -166,22 +162,9 @@ def main(modelfile):
             images = images2
 
         infer_request = request_queue.get_idle_request()
-        # print(infer_request.request)
-        # Infer async
 
         infer_request.start_async({input_blob: images}, bs, target)
         
-        # res = res[out_blob]
-        # res = res.reshape(args.batch_size, n_crops,-1)
-        # #print(res)
-        # res = np.mean(res, axis=1)
-        # if bs != args.batch_size:
-        #     print(res.shape)
-        #     res = res[:bs, :res.shape[1]]
-        # #print(res)
-        # pred = torch.cat((pred, torch.from_numpy(res)), 0)
-        # #print(res.shape)
-
     # wait the latest inference executions
     request_queue.wait_all()
     for i, queue in enumerate(request_queue.requests):
@@ -202,6 +185,9 @@ if __name__ == '__main__':
     parser.add_argument('--fp32', action='store_true')
     parser.add_argument('--int8', action='store_true')
     parser.add_argument('--batch_size', default=32, type=int)
+    parser.add_argument('--num_requests', default=8, type=int)
+    parser.add_argument('--num_workers', default=10, type=int)
+    parser.add_argument('--cpu_throughput_streams', default=8, type=int)
     args = parser.parse_args()
 
     if args.fp32:

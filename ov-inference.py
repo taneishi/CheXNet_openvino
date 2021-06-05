@@ -13,7 +13,7 @@ from read_data import ChestXrayDataSet
 from model import CLASS_NAMES, N_CLASSES
 
 DATA_DIR = './images'
-TEST_IMAGE_LIST = './labels/test_list.txt'
+TEST_IMAGE_LIST = './labels/bmt_list.txt'
 
 N_CROPS = 10
 
@@ -54,7 +54,7 @@ def main(modelfile):
     
     # loading model to the plugin
     log.info('Loading model to the plugin')
-    exec_net = ie.load_network(network=net, device_name='CPU', config={'DYN_BATCH_ENABLED': 'YES'})
+    exec_net = ie.load_network(network=net, device_name='CPU')
 
     for index, (data, target) in enumerate(test_loader):
         start_time = timeit.default_timer()

@@ -75,6 +75,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_path', default='model/model.pth', type=str)
     parser.add_argument('--batch_size', default=32, type=int)
-    args = parser.parse_args([])
+    args = parser.parse_args()
 
     main(args)
