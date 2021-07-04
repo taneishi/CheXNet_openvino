@@ -61,7 +61,7 @@ def main(args):
         gt = torch.cat((gt, target))
         pred = torch.cat((pred, output_mean))
             
-        print('batch %03d/%03d %6.3fsec' % (index, len(test_loader), (timeit.default_timer() - start_time)))
+        print('\rbatch %03d/%03d %6.3fsec' % (index, len(test_loader), (timeit.default_timer() - start_time)), end='')
 
     AUCs = []
     for i in range(N_CLASSES):
@@ -74,7 +74,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_path', default='model/model.pth', type=str)
-    parser.add_argument('--batch_size', default=32, type=int)
+    parser.add_argument('--batch_size', default=1, type=int)
     args = parser.parse_args()
 
     main(args)

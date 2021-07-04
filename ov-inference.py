@@ -93,6 +93,7 @@ if __name__ == '__main__':
     parser.add_argument('--int8', action='store_true')
     parser.add_argument('--batch_size', default=32, type=int)
     args = parser.parse_args()
+    print(vars(args))
 
     if args.fp32:
         main(modelfile='densenet121.xml')
