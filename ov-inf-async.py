@@ -164,6 +164,9 @@ def main(modelfile):
         infer_request = request_queue.get_idle_request()
 
         infer_request.start_async({input_blob: images}, bs, target)
+
+        if i == 20:
+            break
         
     # wait the latest inference executions
     request_queue.wait_all()
