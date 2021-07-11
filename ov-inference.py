@@ -81,6 +81,9 @@ def main(modelfile):
         
         print('%03d/%03d, time: %6.3f sec' % (index, len(test_loader), (timeit.default_timer() - start_time)))
 
+        if index == 10:
+            break
+
     AUCs = [roc_auc_score(gt.cpu()[:, i], pred.cpu()[:, i]) for i in range(N_CLASSES)]
     AUC_avg = np.array(AUCs).mean()
     print('The average AUC is {AUC_avg:.3f}'.format(AUC_avg=AUC_avg))
@@ -93,6 +96,7 @@ if __name__ == '__main__':
     parser.add_argument('--int8', action='store_true')
     parser.add_argument('--batch_size', default=32, type=int)
     args = parser.parse_args()
+    print(vars(args))
 
     if args.fp32:
         main(modelfile='densenet121.xml')
