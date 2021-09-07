@@ -12,9 +12,6 @@ import os
 from read_data import ChestXrayDataSet
 from model import CLASS_NAMES, N_CLASSES
 
-DATA_DIR = './images'
-TEST_IMAGE_LIST = './labels/bmt_list.txt'
-
 N_CROPS = 10
 
 def main(modelfile):
@@ -37,8 +34,8 @@ def main(modelfile):
             [0.485, 0.456, 0.406],
             [0.229, 0.224, 0.225])
 
-    test_dataset = ChestXrayDataSet(data_dir=DATA_DIR,
-            image_list_file=TEST_IMAGE_LIST,
+    test_dataset = ChestXrayDataSet(data_dir=args.data_dir,
+            image_list_file=args.test_image_list,
             transform=transforms.Compose([
                 transforms.Resize(256),
                 transforms.TenCrop(224),
@@ -95,6 +92,8 @@ if __name__ == '__main__':
     parser.add_argument('--fp32', action='store_true')
     parser.add_argument('--int8', action='store_true')
     parser.add_argument('--batch_size', default=32, type=int)
+    parser.add_argument('--test_image_list', default='labels/bmt_list.txt', type=str)
+    parser.add_argument('--data_dir', default='images', type=str)
     args = parser.parse_args()
     print(vars(args))
 
