@@ -50,13 +50,10 @@ def main(modelfile):
             drop_last=True)
 
     gt = torch.FloatTensor()
-    pred = torch.FloatTensor()
 
-    start_time = timeit.default_timer()
+    start = timeit.default_timer()
 
     for index, (data, target) in enumerate(test_loader):
-        gt = torch.cat((gt, target), 0)
-
         batch_size, n_crops, c, h, w = data.size()
         data = data.view(-1, c, h, w).numpy()
 
@@ -65,10 +62,10 @@ def main(modelfile):
 
         exec_net.requests[index].async_infer(inputs={input_blob: images})
 
-        if index == args.num_requests - 1:
-            break
+        gt = torch.cat((gt, target), 0)
 
     output_queue = list(range(args.num_requests))
+    pred = list(range(args.num_requests))
 
     # wait the latest inference executions
     while True:
@@ -85,15 +82,16 @@ def main(modelfile):
                 outputs = np.mean(outputs, axis=1)
                 outputs = outputs[:args.batch_size, :outputs.shape[1]]
 
-                pred = torch.cat((pred, torch.from_numpy(outputs)), 0)
+                pred[index] = torch.from_numpy(outputs)
 
                 output_queue.remove(index)
 
         if len(output_queue) == 0:
             break
 
-    print(len(pred))
-    print('Elapsed time: %0.2f sec.' % (timeit.default_timer() - start_time))
+    pred = torch.cat(pred, 0)
+
+    print('Elapsed time: %0.2f sec.' % (timeit.default_timer() - start))
 
     AUCs = [roc_auc_score(gt[:, i], pred[:, i]) for i in range(N_CLASSES)]
     print('The average AUC is %6.3f' % np.mean(AUCs))
@@ -103,17 +101,16 @@ def main(modelfile):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--fp32', action='store_true')
-    parser.add_argument('--int8', action='store_true')
+    parser.add_argument('--mode', choices=['fp32', 'int8'], default='fp32', type=str)
     parser.add_argument('--num_requests', default=8, type=int)
     parser.add_argument('--batch_size', default=3, type=int)
     parser.add_argument('--data_dir', default='images', type=str)
     parser.add_argument('--test_image_list', default='labels/test_list.txt', type=str)
     args = parser.parse_args()
 
-    if args.fp32:
+    if args.mode == 'fp32':
         main(modelfile='densenet121.xml')
-    elif args.int8:
+    elif args.mode == 'int8':
         main(modelfile='chexnet-pytorch.xml')
     else:
         parser.print_help()

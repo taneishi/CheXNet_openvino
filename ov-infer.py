@@ -11,7 +11,7 @@ from model import CLASS_NAMES, N_CLASSES
 
 def main(modelfile):
     model_xml = 'model/%s' % modelfile
-    model_bin = model_xml.replace('xml', 'bin')
+    model_bin = model_xml.replace('.xml', '.bin')
 
     print('Creating Inference Engine')
     ie = IECore()
@@ -50,6 +50,8 @@ def main(modelfile):
     gt = torch.FloatTensor()
     pred = torch.FloatTensor()
     
+    start = timeit.default_timer()
+
     for index, (data, target) in enumerate(test_loader):
         start_time = timeit.default_timer()
 
@@ -71,6 +73,8 @@ def main(modelfile):
         
         print('%03d/%03d, time: %6.3f sec' % (index, len(test_loader), (timeit.default_timer() - start_time)))
 
+    print('Elapsed time: %0.2f sec.' % (timeit.default_timer() - start))
+
     AUCs = [roc_auc_score(gt[:, i], pred[:, i]) for i in range(N_CLASSES)]
     print('The average AUC is %6.3f' % np.mean(AUCs))
 
@@ -79,17 +83,16 @@ def main(modelfile):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--fp32', action='store_true')
-    parser.add_argument('--int8', action='store_true')
+    parser.add_argument('--mode', choices=['fp32', 'int8'], default='fp32', type=str)
     parser.add_argument('--batch_size', default=3, type=int)
     parser.add_argument('--data_dir', default='images', type=str)
     parser.add_argument('--test_image_list', default='labels/test_list.txt', type=str)
     args = parser.parse_args()
     print(vars(args))
 
-    if args.fp32:
+    if args.mode == 'fp32':
         main(modelfile='densenet121.xml')
-    elif args.int8:
+    elif args.mode == 'int8':
         main(modelfile='chexnet-pytorch.xml')
     else:
         parser.print_help()
