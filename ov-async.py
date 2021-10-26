@@ -2,24 +2,26 @@ import numpy as np
 from sklearn.metrics import roc_auc_score
 import torch
 import torchvision.transforms as transforms
-from openvino.inference_engine import IECore
+from openvino.inference_engine import IECore, StatusCode
 import argparse
 import timeit
 
 from read_data import ChestXrayDataSet
 from model import CLASS_NAMES, N_CLASSES
 
+N_CROPS = 10
+
 def main(modelfile):
     model_xml = 'model/%s' % modelfile
-    model_bin = model_xml.replace('xml', 'bin')
+    model_bin = model_xml.replace('.xml', '.bin')
 
     print('Creating Inference Engine')
     ie = IECore()
     net = ie.read_network(model=model_xml, weights=model_bin)
-
+    
     # loading model to the plugin
     print('Loading model to the plugin')
-    exec_net = ie.load_network(network=net, device_name='CPU')
+    exec_net = ie.load_network(network=net, num_requests=args.num_requests, device_name='CPU')
 
     print('Preparing input blobs')
     input_blob = next(iter(net.input_info))
@@ -49,9 +51,11 @@ def main(modelfile):
 
     gt = torch.FloatTensor()
     pred = torch.FloatTensor()
-    
+
+    start_time = timeit.default_timer()
+
     for index, (data, target) in enumerate(test_loader):
-        start_time = timeit.default_timer()
+        gt = torch.cat((gt, target), 0)
 
         batch_size, n_crops, c, h, w = data.size()
         data = data.view(-1, c, h, w).numpy()
@@ -59,17 +63,37 @@ def main(modelfile):
         images = np.zeros(shape=(32, c, h, w))
         images[:n_crops * args.batch_size, :c, :h, :w] = data
 
-        outputs = exec_net.infer(inputs={input_blob: images})
-        outputs = outputs[output_blob]
+        exec_net.requests[index].async_infer(inputs={input_blob: images})
 
-        outputs = outputs[:n_crops * args.batch_size].reshape(args.batch_size, n_crops, -1)
-        outputs = np.mean(outputs, axis=1)
-        outputs = outputs[:args.batch_size, :outputs.shape[1]]
+        if index == args.num_requests - 1:
+            break
 
-        gt = torch.cat((gt, target), 0)
-        pred = torch.cat((pred, torch.from_numpy(outputs)), 0)
-        
-        print('%03d/%03d, time: %6.3f sec' % (index, len(test_loader), (timeit.default_timer() - start_time)))
+    output_queue = list(range(args.num_requests))
+
+    # wait the latest inference executions
+    while True:
+        for index in output_queue:
+            infer_status = exec_net.requests[index].wait(0)
+
+            if infer_status == StatusCode.RESULT_NOT_READY:
+                continue
+
+            if infer_status == StatusCode.OK:
+                outputs = exec_net.requests[index].output_blobs[output_blob].buffer
+
+                outputs = outputs[:n_crops * args.batch_size].reshape(args.batch_size, n_crops, -1)
+                outputs = np.mean(outputs, axis=1)
+                outputs = outputs[:args.batch_size, :outputs.shape[1]]
+
+                pred = torch.cat((pred, torch.from_numpy(outputs)), 0)
+
+                output_queue.remove(index)
+
+        if len(output_queue) == 0:
+            break
+
+    print(len(pred))
+    print('Elapsed time: %0.2f sec.' % (timeit.default_timer() - start_time))
 
     AUCs = [roc_auc_score(gt[:, i], pred[:, i]) for i in range(N_CLASSES)]
     print('The average AUC is %6.3f' % np.mean(AUCs))
@@ -81,11 +105,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--fp32', action='store_true')
     parser.add_argument('--int8', action='store_true')
+    parser.add_argument('--num_requests', default=8, type=int)
     parser.add_argument('--batch_size', default=3, type=int)
     parser.add_argument('--data_dir', default='images', type=str)
     parser.add_argument('--test_image_list', default='labels/test_list.txt', type=str)
     args = parser.parse_args()
-    print(vars(args))
 
     if args.fp32:
         main(modelfile='densenet121.xml')

@@ -7,8 +7,7 @@ class ChestXrayDataSet(Dataset):
     def __init__(self, data_dir, image_list_file, transform=None):
         '''
         data_dir: path to image directory.
-        image_list_file: path to the file containing images
-            with corresponding labels.
+        image_list_file: path to the file containing images with corresponding labels.
         transform: optional transform to be applied on a sample.
         '''
         image_names = []
@@ -33,7 +32,7 @@ class ChestXrayDataSet(Dataset):
         image_name = self.image_names[index]
         image = Image.open(image_name).convert('RGB')
         label = self.labels[index]
-        if self.transform is not None:
+        if self.transform:
             image = self.transform(image)
         return image, torch.FloatTensor(label)
 
