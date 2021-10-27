@@ -13,7 +13,6 @@ source ~/openvino/bin/activate
 ${PYTHON} export_onnx.py
 
 # fp32 model optimization
-#${PYTHON} ${INTEL_OPENVINO_DIR}/deployment_tools/model_optimizer/mo.py --input_model ${PWD}/model/densenet121.onnx --output_dir model
 mo --input_model ${PWD}/model/densenet121.onnx --output_dir model
 
 # make annotations
