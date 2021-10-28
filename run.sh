@@ -20,6 +20,6 @@ mkdir -p annotations
 ${PYTHON} annotation.py chest_xray --annotation_file labels/val_list.txt -ss 320 -o annotations -a chestx.pickle -m chestx.json --data_dir images
 
 # int8 quantization
-pot -c config/chexnet_int8_pot.yaml -e
+pot -c config/chexnet_int8.yaml -e
 
-${PYTHON} ov-inference.py --int8 --batch_size 2048
+${PYTHON} ov-infer.py --int8
