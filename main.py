@@ -36,6 +36,7 @@ def main(args):
                 transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])),
                 transforms.Lambda(lambda crops: torch.stack([normalize(crop) for crop in crops]))
                 ]))
+
     test_loader = torch.utils.data.DataLoader(
             dataset=test_dataset, 
             batch_size=args.batch_size, 
