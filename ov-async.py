@@ -9,8 +9,6 @@ import timeit
 from read_data import ChestXrayDataSet
 from model import CLASS_NAMES, N_CLASSES
 
-N_CROPS = 10
-
 def main(modelfile):
     model_xml = 'model/%s' % modelfile
     model_bin = model_xml.replace('.xml', '.bin')
@@ -26,6 +24,8 @@ def main(modelfile):
     print('Preparing input blobs')
     input_blob = next(iter(net.input_info))
     output_blob = next(iter(net.outputs))
+
+    model_batch_size, c, h, w = net.input_info[input_blob].input_data.shape
 
     # for image load
     normalize = transforms.Normalize(
@@ -57,7 +57,7 @@ def main(modelfile):
         batch_size, n_crops, c, h, w = data.size()
         data = data.view(-1, c, h, w).numpy()
 
-        images = np.zeros(shape=(32, c, h, w))
+        images = np.zeros(shape=(model_batch_size, c, h, w))
         images[:n_crops * args.batch_size, :c, :h, :w] = data
 
         exec_net.requests[index].async_infer(inputs={input_blob: images})
