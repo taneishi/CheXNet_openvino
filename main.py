@@ -13,13 +13,15 @@ def main(args):
     print('Using %s device.' % device)
     
     # initialize and load the model
-    net = DenseNet121(N_CLASSES).to(device)
-
-    if torch.cuda.device_count() > 1:
-        net = torch.nn.DataParallel(net).to(device)
-
+    net = DenseNet121(N_CLASSES)
     net.load_state_dict(torch.load(args.model_path, map_location=device))
     print('model state has loaded')
+    if torch.cuda.device_count() > 1:
+        net = torch.nn.DataParallel(net).to(device)
+    else:
+        net = net.to(device)
+    # switch to evaluate mode
+    net.eval()
 
     normalize = transforms.Normalize(
             [0.485, 0.456, 0.406],
@@ -44,9 +46,6 @@ def main(args):
     # initialize the ground truth and output tensor
     gt = torch.FloatTensor()
     pred = torch.FloatTensor()
-
-    # switch to evaluate mode
-    net.eval()
 
     for index, (data, target) in enumerate(test_loader):
         start_time = timeit.default_timer()
