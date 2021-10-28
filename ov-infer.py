@@ -25,6 +25,8 @@ def main(modelfile):
     input_blob = next(iter(net.input_info))
     output_blob = next(iter(net.outputs))
 
+    model_batch_size, c, h, w = net.input_info[input_blob].input_data.shape
+
     # for image load
     normalize = transforms.Normalize(
             [0.485, 0.456, 0.406],
@@ -58,7 +60,7 @@ def main(modelfile):
         batch_size, n_crops, c, h, w = data.size()
         data = data.view(-1, c, h, w).numpy()
 
-        images = np.zeros(shape=(32, c, h, w))
+        images = np.zeros(shape=(model_batch_size, c, h, w))
         images[:n_crops * args.batch_size, :c, :h, :w] = data
 
         outputs = exec_net.infer(inputs={input_blob: images})
