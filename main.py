@@ -50,7 +50,7 @@ def main(args):
     for index, (data, target) in enumerate(test_loader):
         start_time = timeit.default_timer()
 
-        target = target.to(device)
+        # each image has 10 crops.
         batch_size, n_crops, c, h, w = data.size()
         data = data.view(-1, c, h, w).to(device)
 
