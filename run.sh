@@ -10,6 +10,6 @@ if [ ${PBS_O_WORKDIR} ]; then cd ${PBS_O_WORKDIR}; fi
 
 source ~/openvino/bin/activate
 
-${PYTHON} infer.py --fp32
+${PYTHON} infer.py --mode fp32
 
-${PYTHON} infer.py --int8
+${PYTHON} infer.py --mode int8
