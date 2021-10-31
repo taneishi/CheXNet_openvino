@@ -86,7 +86,7 @@ def main(modelfile):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--mode', choices=['fp32', 'int8'], default='fp32', type=str)
-    parser.add_argument('--batch_size', default=3, type=int)
+    parser.add_argument('--batch_size', default=16, type=int)
     parser.add_argument('--data_dir', default='images', type=str)
     parser.add_argument('--test_image_list', default='labels/test_list.txt', type=str)
     args = parser.parse_args()

@@ -16,3 +16,4 @@ python annotation.py chest_xray --annotation_file labels/val_list.txt -ss 320 -o
 
 # int8 quantization
 pot -c config/chexnet_int8.yaml -e
+cp $(ls results/chexnet-pytorch_DefaultQuantization/*/optimized/* | tail -3) model

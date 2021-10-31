@@ -17,10 +17,6 @@ def main(modelfile):
     ie = IECore()
     net = ie.read_network(model=model_xml, weights=model_bin)
     
-    # loading model to the plugin
-    print('Loading model to the plugin')
-    exec_net = ie.load_network(network=net, num_requests=args.num_requests, device_name='CPU')
-
     print('Preparing input blobs')
     input_blob = next(iter(net.input_info))
     output_blob = next(iter(net.outputs))
@@ -49,6 +45,12 @@ def main(modelfile):
             pin_memory=False,
             drop_last=True)
 
+    num_requests = len(test_loader)
+
+    # loading model to the plugin
+    print('Loading model to the plugin')
+    exec_net = ie.load_network(network=net, num_requests=num_requests, device_name='CPU')
+
     gt = torch.FloatTensor()
 
     start = timeit.default_timer()
@@ -64,8 +66,8 @@ def main(modelfile):
 
         gt = torch.cat((gt, target), 0)
 
-    output_queue = list(range(args.num_requests))
-    pred = list(range(args.num_requests))
+    output_queue = list(range(num_requests))
+    pred = list(range(num_requests))
 
     # wait the latest inference executions
     while True:
@@ -102,8 +104,7 @@ def main(modelfile):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--mode', choices=['fp32', 'int8'], default='fp32', type=str)
-    parser.add_argument('--num_requests', default=8, type=int)
-    parser.add_argument('--batch_size', default=3, type=int)
+    parser.add_argument('--batch_size', default=16, type=int)
     parser.add_argument('--data_dir', default='images', type=str)
     parser.add_argument('--test_image_list', default='labels/test_list.txt', type=str)
     args = parser.parse_args()
