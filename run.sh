@@ -4,12 +4,9 @@
 #PBS -j oe
 #PBS -o output.log
 
-PYTHON=python
-
 if [ ${PBS_O_WORKDIR} ]; then cd ${PBS_O_WORKDIR}; fi
 
-source ~/openvino/bin/activate
+source openvino/bin/activate
 
-${PYTHON} infer.py --mode fp32
-
-${PYTHON} infer.py --mode int8
+python infer.py --mode fp32
+python infer.py --mode int8

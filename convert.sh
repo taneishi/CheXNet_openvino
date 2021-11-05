@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #python3 -m venv openvino
-#source ~/openvino/bin/activate
+source openvino/bin/activate
 #pip install --upgrade pip
 #pip install openvino_dev torchvision onnx==1.8.1
 
