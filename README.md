@@ -15,9 +15,14 @@ comprises 112,120 frontal-view chest X-ray images of 30,805 unique patients with
 To evaluate the model, we randomly split the dataset into training (70%), validation (10%) and test (20%) sets, following the work in paper. 
 Partitioned image names and corresponding labels are placed under the directory [labels](./ChestX-ray14/labels).
 
-## Prerequisites
+## Requirements
 
-- Docker
+```
+python3 -m venv openvino
+source openvino/bin/activate
+pip install --upgrade pip
+pip install openvino_dev torchvision onnx==1.8.1
+```
 
 ## Usage
 
@@ -25,9 +30,15 @@ Partitioned image names and corresponding labels are placed under the directory 
 
 2. Download images of ChestX-ray14 from this [released page](https://nihcc.app.box.com/v/ChestXray-NIHCC) and decompress them to the directory [images](./ChestX-ray14/images).
 
-3. docker run -it --rm -v ${HOME}/CheXNet:/CheXNet openvino/ubuntu20_dev:2021.3
+```
+python batch_download.py
+```
 
-4. `cd /CheXNet; bash run.sh`
+3. `bash convert.sh`
+
+4. `python infer.py --mode fp32`
+
+5. `python infer.py --mode int8`
 
 ## Comparsion
 
