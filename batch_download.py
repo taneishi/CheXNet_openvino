@@ -1,5 +1,4 @@
 # Download the 12 tgz files in batches
-import urllib.request
 import os
 
 # URLs for the tar.gz files
@@ -19,12 +18,20 @@ links = [
         ]
 
 print('%d files will be downloaded.' % len(links))
+
 for index, link in enumerate(links, 1):
     filename = 'images_%02d.tar.gz' % index
     print(filename)
     if not os.path.exists(filename):
         print('downloading %s...' % filename)
-        urllib.request.urlretrieve(link, filename) # download the tgz file
+
+        cmd = 'wget -c -O %s %s' % (filename, link)
+        sproc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf8')
+        sproc.wait()
+        if sproc.returncode:
+            print('  Failed downloading file %s canceling!' % (link))
+            print(sproc.stderr.readlines())
+            sys.exit()
 
 print('Download complete. Please check the checksums')
 
@@ -42,5 +49,6 @@ sha256sums = [
         '7e7d190f71b5b792c495acb2eebbbf0563a8c528adb23e9335ec3b79cb5b486f',
         '7316ce5f4d5e0154730e592cc2b45b48a2bee8457f6339d36c2ca55ed6e60b26',
         ]
+
 for i, sha256sum in enumerate(sha256sums, 1):
     print('images_%02d.tar.gz sha256sum is %s' % (i, sha256sum))
