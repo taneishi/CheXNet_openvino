@@ -5,7 +5,7 @@ index=1
 for link in $(cat urls.txt) # URLs for the tar.gz files
 do
     seq=$(printf "%02d" ${index})
-    fn="rmages_png_${seq}.tar.gz"
+    fn="images_${seq}.tar.gz"
     echo "wget -c -O ${fn} ${link}"
     wget -c -O ${fn} ${link}
     index=$((index+1))
