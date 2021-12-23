@@ -75,9 +75,6 @@ def main(modelfile):
         
         print('%03d/%03d, time: %6.3f sec' % (index, len(test_loader), (timeit.default_timer() - start_time)))
 
-        if index == 10:
-            break
-
     print('Elapsed time: %0.2f sec.' % (timeit.default_timer() - start))
 
     AUCs = [roc_auc_score(gt[:, i], pred[:, i]) if gt[:, i].sum() > 0 else np.nan for i in range(N_CLASSES)]

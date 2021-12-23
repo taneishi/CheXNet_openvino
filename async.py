@@ -10,7 +10,7 @@ from datasets import ChestXrayDataSet
 from model import CLASS_NAMES, N_CLASSES
 
 def main(modelfile):
-    model_xml = 'model/%s' % modelfile
+    model_xml = 'model/%s' % (modelfile)
     model_bin = model_xml.replace('.xml', '.bin')
 
     print('Creating Inference Engine')
@@ -45,17 +45,18 @@ def main(modelfile):
             pin_memory=False,
             drop_last=True)
 
-    num_requests = len(test_loader)
-
     # loading model to the plugin
     print('Loading model to the plugin')
-    exec_net = ie.load_network(network=net, num_requests=num_requests, device_name='CPU')
+    exec_net = ie.load_network(network=net, num_requests=args.num_requests, device_name='CPU')
 
     gt = torch.FloatTensor()
 
     start = timeit.default_timer()
 
     for index, (data, target) in enumerate(test_loader):
+        if index == 100:
+            break
+
         batch_size, n_crops, c, h, w = data.size()
         data = data.view(-1, c, h, w).numpy()
 
@@ -66,8 +67,8 @@ def main(modelfile):
 
         gt = torch.cat((gt, target), 0)
 
-    output_queue = list(range(num_requests))
-    pred = list(range(num_requests))
+    output_queue = list(range(args.num_requests))
+    pred = list(range(args.num_requests))
 
     # wait the latest inference executions
     while True:
@@ -95,7 +96,7 @@ def main(modelfile):
 
     print('Elapsed time: %0.2f sec.' % (timeit.default_timer() - start))
 
-    AUCs = [roc_auc_score(gt[:, i], pred[:, i]) for i in range(N_CLASSES)]
+    AUCs = [roc_auc_score(gt[:, i], pred[:, i]) if gt[:, i].sum() > 0 else np.nan for i in range(N_CLASSES)]
     print('The average AUC is %6.3f' % np.mean(AUCs))
 
     for i in range(N_CLASSES):
@@ -104,10 +105,12 @@ def main(modelfile):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--mode', choices=['fp32', 'int8'], default='fp32', type=str)
-    parser.add_argument('--batch_size', default=16, type=int)
+    parser.add_argument('--num_requests', default=100, type=int)
+    parser.add_argument('--batch_size', default=1, type=int)
     parser.add_argument('--data_dir', default='images', type=str)
     parser.add_argument('--test_image_list', default='labels/test_list.txt', type=str)
     args = parser.parse_args()
+    print(vars(args))
 
     if args.mode == 'fp32':
         main(modelfile='densenet121.xml')
