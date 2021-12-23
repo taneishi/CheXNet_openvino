@@ -2,16 +2,13 @@ import torch
 import argparse
 import os
 
-from model import DenseNet121, CLASS_NAMES, N_CLASSES
+from model import DenseNet121, N_CLASSES
 
 def main(args):
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    
-    # initialize and load the model
-    model = DenseNet121(N_CLASSES).to(device)
+    device = torch.device('cpu')
 
-    if torch.cuda.device_count() > 1:
-        model = torch.nn.DataParallel(model).to(device)
+    # initialize and load the model
+    model = DenseNet121(N_CLASSES)
 
     if os.path.isfile(args.model_path):
         model.load_state_dict(torch.load(args.model_path, map_location=device))
@@ -20,8 +17,10 @@ def main(args):
         print('=> model state file not found')
 
     model.train(False)
+
     dummy_input = torch.randn(args.batch_size, 3, 224, 224)
     torch_out = model(dummy_input)
+
     torch.onnx.export(model,
             dummy_input,
             'model/densenet121.onnx',
@@ -31,7 +30,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_path', default='model/model.pth', type=str)
-    parser.add_argument('--batch_size', default=160, type=int)
+    parser.add_argument('--batch_size', default=10, type=int)
     args = parser.parse_args()
 
     main(args)
