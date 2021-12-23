@@ -1,10 +1,10 @@
 model:
   model_name: chexnet-pytorch
-  model: ./model/densenet121.xml
-  weights: ./model/densenet121.bin
+  model: model/densenet121.xml
+  weights: model/densenet121.bin
 
 engine:
-  config: ./config/chexnet.yaml
+  config: config/chexnet.yaml
 
 compression:
   algorithms:
