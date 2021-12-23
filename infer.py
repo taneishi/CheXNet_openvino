@@ -75,9 +75,12 @@ def main(modelfile):
         
         print('%03d/%03d, time: %6.3f sec' % (index, len(test_loader), (timeit.default_timer() - start_time)))
 
+        if index == 10:
+            break
+
     print('Elapsed time: %0.2f sec.' % (timeit.default_timer() - start))
 
-    AUCs = [roc_auc_score(gt[:, i], pred[:, i]) for i in range(N_CLASSES)]
+    AUCs = [roc_auc_score(gt[:, i], pred[:, i]) if gt[:, i].sum() > 0 else np.nan for i in range(N_CLASSES)]
     print('The average AUC is %6.3f' % np.mean(AUCs))
 
     for i in range(N_CLASSES):
@@ -86,7 +89,7 @@ def main(modelfile):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--mode', choices=['fp32', 'int8'], default='fp32', type=str)
-    parser.add_argument('--batch_size', default=16, type=int)
+    parser.add_argument('--batch_size', default=1, type=int)
     parser.add_argument('--data_dir', default='images', type=str)
     parser.add_argument('--test_image_list', default='labels/test_list.txt', type=str)
     args = parser.parse_args()

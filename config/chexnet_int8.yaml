@@ -11,4 +11,4 @@ compression:
   - name: DefaultQuantization
     params:
       preset: mixed
-      stat_subset_size: 320
+      stat_subset_size: 10

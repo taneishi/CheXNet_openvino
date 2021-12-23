@@ -6,7 +6,33 @@
 
 if [ ${PBS_O_WORKDIR} ]; then cd ${PBS_O_WORKDIR}; fi
 
-source openvino/bin/activate
+if [ ! -d openvino ]; then
+    python3 -m venv openvino
+    source openvino/bin/activate
+    pip install --upgrade pip
+    pip install openvino_dev torchvision onnx
+else
+    source openvino/bin/activate
+fi
+
+if [ ! -f model/densenet121.onnx ]; then
+    python export_onnx.py
+fi
+
+if [ ! -f model/densenet121.xml ]; then
+    # fp32 model optimization
+    mo --input_model model/densenet121.onnx --output_dir model
+fi
+
+if [ ! -f model/chexnet-pytorch.xml ]; then
+    # make annotations
+    mkdir -p annotations
+    python annotation.py chest_xray --annotation_file labels/val_list.txt -ss 10 -o annotations -a chestx.pickle -m chestx.json --data_dir images
+
+    # int8 quantization
+    pot -c config/chexnet_int8.yaml -e
+    cp $(ls results/chexnet-pytorch_DefaultQuantization/*/optimized/* | tail -3) model
+fi
 
 python infer.py --mode fp32
 python infer.py --mode int8
