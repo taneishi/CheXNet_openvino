@@ -5,7 +5,7 @@ from sklearn.metrics import roc_auc_score
 import argparse
 import timeit
 
-from read_data import ChestXrayDataSet
+from datasets import ChestXrayDataSet
 from model import DenseNet121, CLASS_NAMES, N_CLASSES
 
 def main(args):
@@ -20,6 +20,7 @@ def main(args):
         net = torch.nn.DataParallel(net).to(device)
     else:
         net = net.to(device)
+
     # switch to evaluate mode
     net.eval()
 

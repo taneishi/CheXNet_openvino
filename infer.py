@@ -6,7 +6,7 @@ from openvino.inference_engine import IECore
 import argparse
 import timeit
 
-from read_data import ChestXrayDataSet
+from datasets import ChestXrayDataSet
 from model import CLASS_NAMES, N_CLASSES
 
 def main(modelfile):
