@@ -2,13 +2,12 @@ from accuracy_checker.annotation_converters.convert import main
 from accuracy_checker.annotation_converters.format_converter import FileBasedAnnotationConverter, ConverterReturn
 from accuracy_checker.representation import MultiLabelRecognitionAnnotation
 from accuracy_checker.config import PathField
-from accuracy_checker.utils import get_path
 import os
 
 from main import CLASS_NAMES
 
 class ChestXRayConverter(FileBasedAnnotationConverter):
-    __provider__ = 'chest_xray'
+    __provider__ = 'chestxray14'
     annotation_types = (MultiLabelRecognitionAnnotation,)
 
     @classmethod

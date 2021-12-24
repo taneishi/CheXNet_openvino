@@ -73,9 +73,9 @@ def main(modelfile):
         gt = torch.cat((gt, target), 0)
         pred = torch.cat((pred, torch.from_numpy(outputs)), 0)
         
-        print('%03d/%03d, time: %6.3f sec' % (index, len(test_loader), (timeit.default_timer() - start_time)))
+        print('\r% 4d/% 4d, time: %6.3f sec' % (index, len(test_loader), (timeit.default_timer() - start_time)), end='')
 
-    print('Elapsed time: %0.2f sec.' % (timeit.default_timer() - start))
+    print('\nElapsed time: %0.2f sec.' % (timeit.default_timer() - start))
 
     AUCs = [roc_auc_score(gt[:, i], pred[:, i]) if gt[:, i].sum() > 0 else np.nan for i in range(N_CLASSES)]
     print('The average AUC is %6.3f' % np.mean(AUCs))
@@ -95,6 +95,6 @@ if __name__ == '__main__':
     if args.mode == 'fp32':
         main(modelfile='densenet121.xml')
     elif args.mode == 'int8':
-        main(modelfile='chexnet-pytorch.xml')
+        main(modelfile='chexnet.xml')
     else:
         parser.print_help()

@@ -1,5 +1,5 @@
 model:
-  model_name: chexnet-pytorch
+  model_name: chexnet
   model: model/densenet121.xml
   weights: model/densenet121.bin
 
@@ -11,4 +11,4 @@ compression:
   - name: DefaultQuantization
     params:
       preset: mixed
-      stat_subset_size: 10
+      stat_subset_size: 100

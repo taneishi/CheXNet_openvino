@@ -16,7 +16,8 @@ else
 fi
 
 if [ ! -f model/densenet121.onnx ]; then
-    python export_onnx.py
+    rm -f model/*.xml
+    python export_onnx.py --batch_size 100
 fi
 
 if [ ! -f model/densenet121.xml ]; then
@@ -27,12 +28,13 @@ fi
 if [ ! -f model/chexnet-pytorch.xml ]; then
     # make annotations
     mkdir -p annotations
-    python annotation.py chest_xray --annotation_file labels/val_list.txt -ss 10 -o annotations -a chestx.pickle -m chestx.json --data_dir images
+    python annotation.py chestxray14 --annotation_file labels/test_list.txt -ss 1000 \
+        -o annotations -a chestxray14.pickle -m chestxray14.json --data_dir images
 
     # int8 quantization
     pot -c config/chexnet_int8.yaml -e
     cp $(ls results/chexnet-pytorch_DefaultQuantization/*/optimized/* | tail -3) model
 fi
 
-python infer.py --mode fp32
-python infer.py --mode int8
+python infer.py --mode fp32 --batch_size 10
+python infer.py --mode int8 --batch_size 10
