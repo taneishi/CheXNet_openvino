@@ -49,11 +49,11 @@ def main(modelfile):
     print('Loading model to the plugin')
     exec_net = ie.load_network(network=net, num_requests=args.num_requests, device_name='CPU')
 
-    gt = torch.FloatTensor()
+    y_true = torch.FloatTensor()
 
     start = timeit.default_timer()
 
-    for index, (data, target) in enumerate(test_loader):
+    for index, (data, labels) in enumerate(test_loader):
         if index == 100:
             break
 
@@ -65,10 +65,10 @@ def main(modelfile):
 
         exec_net.requests[index].async_infer(inputs={input_blob: images})
 
-        gt = torch.cat((gt, target), 0)
+        y_true = torch.cat((y_true, labels), 0)
 
     output_queue = list(range(args.num_requests))
-    pred = list(range(args.num_requests))
+    y_pred = list(range(args.num_requests))
 
     # wait the latest inference executions
     while True:
@@ -85,18 +85,18 @@ def main(modelfile):
                 outputs = np.mean(outputs, axis=1)
                 outputs = outputs[:args.batch_size, :outputs.shape[1]]
 
-                pred[index] = torch.from_numpy(outputs)
+                y_pred[index] = torch.from_numpy(outputs)
 
                 output_queue.remove(index)
 
         if len(output_queue) == 0:
             break
 
-    pred = torch.cat(pred, 0)
+    y_pred = torch.cat(y_pred, 0)
 
     print('Elapsed time: %0.2f sec.' % (timeit.default_timer() - start))
 
-    AUCs = [roc_auc_score(gt[:, i], pred[:, i]) if gt[:, i].sum() > 0 else np.nan for i in range(N_CLASSES)]
+    AUCs = [roc_auc_score(y_true[:, i], pred[:, i]) if y_true[:, i].sum() > 0 else np.nan for i in range(N_CLASSES)]
     print('The average AUC is %6.3f' % np.mean(AUCs))
 
     for i in range(N_CLASSES):

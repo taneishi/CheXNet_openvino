@@ -49,12 +49,12 @@ def main(modelfile):
             pin_memory=False,
             drop_last=True)
 
-    gt = torch.FloatTensor()
-    pred = torch.FloatTensor()
+    y_true = torch.FloatTensor()
+    y_pred = torch.FloatTensor()
     
     start = timeit.default_timer()
 
-    for index, (data, target) in enumerate(test_loader):
+    for index, (data, labels) in enumerate(test_loader):
         start_time = timeit.default_timer()
 
         batch_size, n_crops, c, h, w = data.size()
@@ -70,14 +70,14 @@ def main(modelfile):
         outputs = np.mean(outputs, axis=1)
         outputs = outputs[:args.batch_size, :outputs.shape[1]]
 
-        gt = torch.cat((gt, target), 0)
-        pred = torch.cat((pred, torch.from_numpy(outputs)), 0)
+        y_true = torch.cat((y_true, labels), 0)
+        y_pred = torch.cat((y_pred, torch.from_numpy(outputs)), 0)
         
         print('\r% 4d/% 4d, time: %6.3f sec' % (index, len(test_loader), (timeit.default_timer() - start_time)), end='')
 
     print('\nElapsed time: %0.2f sec.' % (timeit.default_timer() - start))
 
-    AUCs = [roc_auc_score(gt[:, i], pred[:, i]) if gt[:, i].sum() > 0 else np.nan for i in range(N_CLASSES)]
+    AUCs = [roc_auc_score(y_true[:, i], y_pred[:, i]) if y_true[:, i].sum() > 0 else np.nan for i in range(N_CLASSES)]
     print('The average AUC is %6.3f' % np.mean(AUCs))
 
     for i in range(N_CLASSES):
