@@ -57,12 +57,12 @@ def main(args):
         data = data.view(-1, c, h, w).to(device)
 
         with torch.no_grad():
-            output = net(data)
+            outputs = net(data)
 
-        output_mean = output.view(batch_size, n_crops, -1).mean(1)
+        outputs_mean = outputs.view(batch_size, n_crops, -1).mean(1)
 
         gt = torch.cat((gt, target))
-        pred = torch.cat((pred, output_mean))
+        pred = torch.cat((pred, outputs_mean))
             
         print('batch %03d/%03d %6.3fsec' % (index, len(test_loader), (timeit.default_timer() - start_time)))
 
@@ -75,7 +75,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_path', default='model/model.pth', type=str)
-    parser.add_argument('--batch_size', default=16, type=int)
+    parser.add_argument('--batch_size', default=10, type=int)
     parser.add_argument('--data_dir', default='images', type=str)
     parser.add_argument('--test_image_list', default='labels/test_list.txt', type=str)
     args = parser.parse_args()

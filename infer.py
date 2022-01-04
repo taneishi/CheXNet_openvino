@@ -7,25 +7,36 @@ import argparse
 import timeit
 
 from datasets import ChestXrayDataSet
-from model import CLASS_NAMES, N_CLASSES
+from model import DenseNet121, CLASS_NAMES, N_CLASSES
 
-def main(modelfile):
-    model_xml = 'model/%s' % modelfile
-    model_bin = model_xml.replace('.xml', '.bin')
+def main(args):
+    if args.mode == 'torch':
+        net = DenseNet121(N_CLASSES)
+        net.load_state_dict(torch.load('model/model.pth', map_location=torch.device('cpu')))
+        print('model state has loaded')
 
-    print('Creating Inference Engine')
-    ie = IECore()
-    net = ie.read_network(model=model_xml, weights=model_bin)
+    elif args.mode == 'fp32' or args.mode == 'int8':
+        if args.mode == 'fp32':
+            modelfile = 'densenet121.xml'
+        elif args.mode == 'int8':
+            modelfile = 'chexnet.xml'
+        
+        model_xml = 'model/%s' % (modelfile)
+        model_bin = model_xml.replace('.xml', '.bin')
 
-    # loading model to the plugin
-    print('Loading model to the plugin')
-    exec_net = ie.load_network(network=net, device_name='CPU')
+        print('Creating Inference Engine')
+        ie = IECore()
+        net = ie.read_network(model=model_xml, weights=model_bin)
 
-    print('Preparing input blobs')
-    input_blob = next(iter(net.input_info))
-    output_blob = next(iter(net.outputs))
+        # loading model to the plugin
+        print('Loading model to the plugin')
+        exec_net = ie.load_network(network=net, device_name='CPU')
 
-    model_batch_size, c, h, w = net.input_info[input_blob].input_data.shape
+        print('Preparing input blobs')
+        input_blob = next(iter(net.input_info))
+        output_blob = next(iter(net.outputs))
+
+        model_batch_size, c, h, w = net.input_info[input_blob].input_data.shape
 
     # for image load
     normalize = transforms.Normalize(
@@ -52,49 +63,47 @@ def main(modelfile):
     y_true = torch.FloatTensor()
     y_pred = torch.FloatTensor()
     
-    start = timeit.default_timer()
-
     for index, (data, labels) in enumerate(test_loader):
         start_time = timeit.default_timer()
 
         batch_size, n_crops, c, h, w = data.size()
-        data = data.view(-1, c, h, w).numpy()
+        data = data.view(-1, c, h, w)
 
-        images = np.zeros(shape=(model_batch_size, c, h, w))
-        images[:n_crops * args.batch_size, :c, :h, :w] = data
+        if args.mode == 'torch':
+            with torch.no_grad():
+                outputs = net(data)
+            outputs = outputs.view(batch_size, n_crops, -1).mean(1)
+            outputs = outputs.numpy()
 
-        outputs = exec_net.infer(inputs={input_blob: images})
-        outputs = outputs[output_blob]
+        elif args.mode == 'fp32' or args.mode == 'int8':
+            images = np.zeros(shape=(model_batch_size, c, h, w))
+            images[:n_crops * args.batch_size, :c, :h, :w] = data.numpy()
 
-        outputs = outputs[:n_crops * args.batch_size].reshape(args.batch_size, n_crops, -1)
-        outputs = np.mean(outputs, axis=1)
-        outputs = outputs[:args.batch_size, :outputs.shape[1]]
+            outputs = exec_net.infer(inputs={input_blob: images})
+            outputs = outputs[output_blob]
+
+            outputs = outputs[:n_crops * args.batch_size].reshape(args.batch_size, n_crops, -1)
+            outputs = np.mean(outputs, axis=1)
+            outputs = outputs[:args.batch_size, :outputs.shape[1]]
 
         y_true = torch.cat((y_true, labels), 0)
         y_pred = torch.cat((y_pred, torch.from_numpy(outputs)), 0)
         
         print('\r% 4d/% 4d, time: %6.3f sec' % (index, len(test_loader), (timeit.default_timer() - start_time)), end='')
 
-    print('\nElapsed time: %0.2f sec.' % (timeit.default_timer() - start))
+        AUCs = [roc_auc_score(y_true[:, i], y_pred[:, i]) if y_true[:, i].sum() > 0 else np.nan for i in range(N_CLASSES)]
+        print('The average AUC is %5.3f' % np.mean(AUCs))
 
-    AUCs = [roc_auc_score(y_true[:, i], y_pred[:, i]) if y_true[:, i].sum() > 0 else np.nan for i in range(N_CLASSES)]
-    print('The average AUC is %6.3f' % np.mean(AUCs))
-
-    for i in range(N_CLASSES):
-        print('The AUC of %s is %6.3f' % (CLASS_NAMES[i], AUCs[i]))
+        for i in range(N_CLASSES):
+            print('The AUC of %s is %5.3f' % (CLASS_NAMES[i], AUCs[i]))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--mode', choices=['fp32', 'int8'], default='fp32', type=str)
-    parser.add_argument('--batch_size', default=1, type=int)
+    parser.add_argument('--mode', choices=['torch', 'fp32', 'int8'], default='torch', type=str)
+    parser.add_argument('--batch_size', default=10, type=int)
     parser.add_argument('--data_dir', default='images', type=str)
     parser.add_argument('--test_image_list', default='labels/test_list.txt', type=str)
     args = parser.parse_args()
     print(vars(args))
 
-    if args.mode == 'fp32':
-        main(modelfile='densenet121.xml')
-    elif args.mode == 'int8':
-        main(modelfile='chexnet.xml')
-    else:
-        parser.print_help()
+    main(args)
