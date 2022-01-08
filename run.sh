@@ -4,7 +4,9 @@
 #PBS -j oe
 #PBS -o output.log
 
-if [ ${PBS_O_WORKDIR} ]; then cd ${PBS_O_WORKDIR}; fi
+if [ ${PBS_O_WORKDIR} ]; then
+    cd ${PBS_O_WORKDIR}
+fi
 
 if [ ! -d openvino ]; then
     python3 -m venv openvino
