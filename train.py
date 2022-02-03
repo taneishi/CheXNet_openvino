@@ -89,7 +89,7 @@ def main(args):
             print(' %6.3fsec' % (timeit.default_timer() - start_time), end='')
 
             AUCs = [roc_auc_score(y_true[:, i], y_pred.detach().numpy()[:, i]) if y_true[:, i].sum() > 0 else np.nan for i in range(N_CLASSES)]
-            print(' average AUC is %6.3f' % np.mean(AUCs))
+            print(' average AUC is %6.3f' % np.mean(AUCs), end='')
 
         print('\repoch % 5d/% 5d train loss %6.4f' % (epoch+1, args.epochs, train_loss / len(train_loader)), end='')
         print(' %6.3fsec' % (timeit.default_timer() - start_time))
