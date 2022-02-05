@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -l nodes=1:gold6258r
+#PBS -l nodes=1:gold6338n
 #PBS -N chexnet
 #PBS -j oe
 #PBS -o output.log
@@ -35,7 +35,7 @@ if [ ! -f model/chexnet-pytorch.xml ]; then
 
     # int8 quantization
     pot -c config/chexnet_int8.yaml -e
-    cp $(ls results/chexnet-pytorch_DefaultQuantization/*/optimized/* | tail -3) model
+    cp $(ls results/chexnet_DefaultQuantization/*/optimized/* | tail -3) model
 fi
 
 python infer.py --mode torch --batch_size 10
