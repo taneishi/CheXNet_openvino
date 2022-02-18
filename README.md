@@ -70,6 +70,6 @@ Although performance-first quantization was used for the quantization, the ROC-A
 
 ## Contributions
 
-Optimization and quantization using OpenVINO were done in collaboration with Hiroshi Ouchiyama (Intel). 
+The dataset `ChestX-ray14` wad suggested by Noriaki Sato (Kyoto University).
+Annotation converter for the dataset was developed in collaboration with Hiroshi Ouchiyama (Intel). 
 I also evaluated the results in the DevCloud for the Edge environment provided by Intel.
-

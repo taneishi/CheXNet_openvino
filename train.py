@@ -68,8 +68,6 @@ def main(args):
         train_loss = 0
         net.train()
         for index, (images, labels) in enumerate(train_loader):
-            print('\rbatch % 3d/% 3d' % (index, len(train_loader)), end='')
-
             images = images.to(device)
             labels = labels.to(device)
 
@@ -85,13 +83,13 @@ def main(args):
             y_true = torch.cat((y_true, labels), 0)
             y_pred = torch.cat((y_pred, outputs.detach()), 0)
                 
-            print('\rbatch % 5d/% 5d train loss %6.4f' % (index+1, len(train_loader), train_loss / (index+1)), end='')
+            print('\rbatch %5d/%5d train loss %6.4f' % (index+1, len(train_loader), train_loss / (index+1)), end='')
             print(' %6.3fsec' % (timeit.default_timer() - start_time), end='')
 
             AUCs = [roc_auc_score(y_true[:, i], y_pred.detach().numpy()[:, i]) if y_true[:, i].sum() > 0 else np.nan for i in range(N_CLASSES)]
             print(' average AUC is %6.3f' % np.mean(AUCs), end='')
 
-        print('\repoch % 5d/% 5d train loss %6.4f' % (epoch+1, args.epochs, train_loss / len(train_loader)), end='')
+        print('\repoch %5d/%5d train loss %6.4f' % (epoch+1, args.epochs, train_loss / len(train_loader)), end='')
         print(' %6.3fsec' % (timeit.default_timer() - start_time))
 
         AUCs = [roc_auc_score(y_true[:, i], y_pred.detach().numpy()[:, i]) if y_true[:, i].sum() > 0 else np.nan for i in range(N_CLASSES)]
