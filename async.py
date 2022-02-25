@@ -94,7 +94,7 @@ def main(modelfile):
 
     y_pred = torch.cat(y_pred, 0)
 
-    print('Elapsed time: %0.2f sec.' % (timeit.default_timer() - start))
+    print('Elapsed time: %0.2fsec.' % (timeit.default_timer() - start))
 
     AUCs = [roc_auc_score(y_true[:, i], pred[:, i]) if y_true[:, i].sum() > 0 else np.nan for i in range(N_CLASSES)]
     print('The average AUC is %6.3f' % np.mean(AUCs))
