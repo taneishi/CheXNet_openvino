@@ -70,6 +70,5 @@ Although performance-first quantization was used for the quantization, the ROC-A
 
 ## Contributions
 
-The dataset `ChestX-ray14` wad suggested by Noriaki Sato (Kyoto University).
-The annotation converter for the dataset was developed in collaboration with Hiroshi Ouchiyama (Intel). 
-I also evaluated the results in the DevCloud for the Edge environment provided by Intel.
+The dataset `ChestX-ray14` was suggested by Noriaki Sato (Kyoto University).
+The annotation converter for the dataset was developed by Hiroshi Ouchiyama (Intel). 
