@@ -19,21 +19,9 @@ class ChestXRayConverter(FileBasedAnnotationConverter):
         return parameters
 
     def configure(self):
-        '''
-        This method is responsible for obtaining the necessary parameters
-        for converting from the command line or config.
-        '''
         self.data_dir = self.config['data_dir']
 
     def convert(self, check_content=False, progress_callback=None, progress_interval=100, **kwargs):
-        '''
-        This method is executed automatically when convert.py is started.
-        All arguments are automatically got from command line arguments or config file in method configure
-
-        Returns:
-            annotations: list of annotation representation objects.
-            meta: dictionary with additional dataset level metadata (if provided)
-        '''
         # read and convert annotation
         image_list_file = os.path.join('labels', 'val_list.txt')
         

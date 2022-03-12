@@ -93,9 +93,8 @@ def main(args):
 
         AUCs = [roc_auc_score(y_true[:, i], y_pred[:, i]) if y_true[:, i].sum() > 0 else np.nan for i in range(N_CLASSES)]
         print(' The average AUC is %5.3f' % np.mean(AUCs))
-
-        #for i in range(N_CLASSES):
-        #    print('The AUC of %s is %5.3f' % (CLASS_NAMES[i], AUCs[i]))
+        for i in range(N_CLASSES):
+            print('The AUC of %s is %5.3f' % (CLASS_NAMES[i], AUCs[i]))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
