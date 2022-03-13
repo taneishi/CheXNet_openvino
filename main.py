@@ -15,9 +15,11 @@ def main(args):
     # initialize and load the model
     net = DenseNet121(N_CLASSES)
     net.load_state_dict(torch.load(args.model_path, map_location=device))
-    print('model state has loaded')
+    print('model state has loaded.')
+
     if torch.cuda.device_count() > 1:
         net = torch.nn.DataParallel(net).to(device)
+        print('Using %d cuda devices.' % (torch.cuda.device_count()))
     else:
         net = net.to(device)
 
