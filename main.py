@@ -10,7 +10,7 @@ from model import DenseNet121, CLASS_NAMES, N_CLASSES
 
 def main(args):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print('Using %s device.' % device)
+    print('Using %s device.' % (device))
     
     # initialize and load the model
     net = DenseNet121(N_CLASSES)
