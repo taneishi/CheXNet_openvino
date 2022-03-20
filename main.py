@@ -48,8 +48,8 @@ def main(args):
             drop_last=True)
 
     # initialize the ground truth and output tensor
-    gt = torch.FloatTensor()
-    pred = torch.FloatTensor()
+    y_true = torch.FloatTensor()
+    y_pred = torch.FloatTensor()
 
     for index, (data, target) in enumerate(test_loader):
         start_time = timeit.default_timer()
@@ -63,16 +63,14 @@ def main(args):
 
         outputs_mean = outputs.view(batch_size, n_crops, -1).mean(1)
 
-        gt = torch.cat((gt, target))
-        pred = torch.cat((pred, outputs_mean))
+        y_true = torch.cat((y_true, target))
+        y_pred = torch.cat((y_pred, outputs_mean))
             
         print('batch %5d/%5d %6.3fsec' % (index, len(test_loader), (timeit.default_timer() - start_time)))
 
-    AUCs = [roc_auc_score(gt[:, i], pred[:, i]) for i in range(N_CLASSES)]
-    print('The average AUC is %6.3f' % np.mean(AUCs))
-
-    for i in range(N_CLASSES):
-        print('The AUC of %s is %6.3f' % (CLASS_NAMES[i], AUCs[i]))
+    aucs = [roc_auc_score(y_true[:, i], y_pred[:, i]) for i in range(N_CLASSES)]
+    auc_classes = ' '.join(['%5.3f' % (aucs[i]) for i in range(N_CLASSES)])
+    print('The average AUC is %5.3f (%s)' % (np.mean(AUCs), auc_classes))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
