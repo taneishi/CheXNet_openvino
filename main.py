@@ -1,7 +1,8 @@
 import numpy as np
-import torchvision.transforms as transforms
-import torch
 from sklearn.metrics import roc_auc_score
+import torch
+import torchvision.transforms as transforms
+from openvino.inference_engine import IECore
 import argparse
 import timeit
 
@@ -9,23 +10,35 @@ from datasets import ChestXrayDataSet
 from model import DenseNet121, CLASS_NAMES, N_CLASSES
 
 def main(args):
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print('Using %s device.' % (device))
-    
-    # initialize and load the model
-    net = DenseNet121(N_CLASSES)
-    net.load_state_dict(torch.load(args.model_path, map_location=device))
-    print('model state has loaded.')
+    if args.mode == 'torch':
+        net = DenseNet121(N_CLASSES)
+        net.load_state_dict(torch.load('model/model.pth', map_location=torch.device('cpu')))
+        print('model state has loaded')
 
-    if torch.cuda.device_count() > 1:
-        net = torch.nn.DataParallel(net).to(device)
-        print('Using %d cuda devices.' % (torch.cuda.device_count()))
-    else:
-        net = net.to(device)
+    elif args.mode == 'fp32' or args.mode == 'int8':
+        if args.mode == 'fp32':
+            modelfile = 'densenet121.xml'
+        elif args.mode == 'int8':
+            modelfile = 'chexnet.xml'
+        
+        model_xml = 'model/%s' % (modelfile)
+        model_bin = model_xml.replace('.xml', '.bin')
 
-    # switch to evaluate mode
-    net.eval()
+        print('Creating Inference Engine')
+        ie = IECore()
+        net = ie.read_network(model=model_xml, weights=model_bin)
 
+        # loading model to the plugin
+        print('Loading model to the plugin')
+        exec_net = ie.load_network(network=net, device_name='CPU')
+
+        print('Preparing input blobs')
+        input_blob = next(iter(net.input_info))
+        output_blob = next(iter(net.outputs))
+
+        model_batch_size, c, h, w = net.input_info[input_blob].input_data.shape
+
+    # for image load
     normalize = transforms.Normalize(
             [0.485, 0.456, 0.406],
             [0.229, 0.224, 0.225])
@@ -39,42 +52,52 @@ def main(args):
                 transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])),
                 transforms.Lambda(lambda crops: torch.stack([normalize(crop) for crop in crops]))
                 ]))
-
+    
     test_loader = torch.utils.data.DataLoader(
-            dataset=test_dataset, 
-            batch_size=args.batch_size, 
-            shuffle=False, 
-            pin_memory=False, 
+            dataset=test_dataset,
+            batch_size=args.batch_size,
+            shuffle=False,
+            pin_memory=False,
             drop_last=True)
 
-    # initialize the ground truth and output tensor
     y_true = torch.FloatTensor()
     y_pred = torch.FloatTensor()
-
-    for index, (data, target) in enumerate(test_loader):
+    
+    for index, (data, labels) in enumerate(test_loader):
         start_time = timeit.default_timer()
 
-        # each image has 10 crops.
         batch_size, n_crops, c, h, w = data.size()
-        data = data.view(-1, c, h, w).to(device)
+        data = data.view(-1, c, h, w)
 
-        with torch.no_grad():
-            outputs = net(data)
+        if args.mode == 'torch':
+            with torch.no_grad():
+                outputs = net(data)
+            outputs = outputs.view(batch_size, n_crops, -1).mean(1)
+            outputs = outputs.numpy()
 
-        outputs_mean = outputs.view(batch_size, n_crops, -1).mean(1)
+        elif args.mode == 'fp32' or args.mode == 'int8':
+            images = np.zeros(shape=(model_batch_size, c, h, w))
+            images[:n_crops * args.batch_size, :c, :h, :w] = data.numpy()
 
-        y_true = torch.cat((y_true, target))
-        y_pred = torch.cat((y_pred, outputs_mean))
-            
-        print('batch %5d/%5d %6.3fsec' % (index, len(test_loader), (timeit.default_timer() - start_time)))
+            outputs = exec_net.infer(inputs={input_blob: images})
+            outputs = outputs[output_blob]
 
-    aucs = [roc_auc_score(y_true[:, i], y_pred[:, i]) for i in range(N_CLASSES)]
-    auc_classes = ' '.join(['%5.3f' % (aucs[i]) for i in range(N_CLASSES)])
-    print('The average AUC is %5.3f (%s)' % (np.mean(AUCs), auc_classes))
+            outputs = outputs[:n_crops * args.batch_size].reshape(args.batch_size, n_crops, -1)
+            outputs = np.mean(outputs, axis=1)
+            outputs = outputs[:args.batch_size, :outputs.shape[1]]
+
+        y_true = torch.cat((y_true, labels), 0)
+        y_pred = torch.cat((y_pred, torch.from_numpy(outputs)), 0)
+        
+        print('\r%4d/%4d, time: %6.3fsec' % (index, len(test_loader), (timeit.default_timer() - start_time)), end='')
+
+        aucs = [roc_auc_score(y_true[:, i], y_pred[:, i]) if y_true[:, i].sum() > 0 else np.nan for i in range(N_CLASSES)]
+        auc_classes = ' '.join(['%5.3f' % (aucs[i]) for i in range(N_CLASSES)])
+        print(' The average AUC is %5.3f (%s)' % (np.mean(aucs), auc_classes), end='')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model_path', default='model/model.pth', type=str)
+    parser.add_argument('--mode', choices=['torch', 'fp32', 'int8'], default='torch', type=str)
     parser.add_argument('--batch_size', default=10, type=int)
     parser.add_argument('--data_dir', default='images', type=str)
     parser.add_argument('--test_image_list', default='labels/test_list.txt', type=str)

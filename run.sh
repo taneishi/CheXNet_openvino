@@ -8,14 +8,7 @@ if [ ${PBS_O_WORKDIR} ]; then
     cd ${PBS_O_WORKDIR}
 fi
 
-if [ -d openvino ]; then
-    source openvino/bin/activate
-else
-    python3 -m venv openvino
-    source openvino/bin/activate
-    pip install --upgrade pip
-    pip install openvino_dev torchvision onnx
-fi
+pip install -r requirements.txt
 
 if [ ! -f model/densenet121.onnx ]; then
     rm -f model/*.xml
@@ -38,6 +31,6 @@ if [ ! -f model/chexnet-pytorch.xml ]; then
     cp $(ls results/chexnet_DefaultQuantization/*/optimized/* | tail -3) model
 fi
 
-python infer.py --mode torch --batch_size 10
-python infer.py --mode fp32 --batch_size 10
-python infer.py --mode int8 --batch_size 10
+python main.py --mode torch --batch_size 10
+python main.py --mode fp32 --batch_size 10
+python main.py --mode int8 --batch_size 10

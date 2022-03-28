@@ -56,9 +56,9 @@ bash run.sh
 The following scripts are used to perform inference on the PyTorch, FP32 optimized and INT8 quantized models, respectively.
 
 ```bash
-python infer.py --mode torch
-python infer.py --mode fp32
-python infer.py --mode int8
+python main.py --mode torch
+python main.py --mode fp32
+python main.py --mode int8
 ```
 
 ## Results
