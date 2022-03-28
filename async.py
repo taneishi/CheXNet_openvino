@@ -96,10 +96,9 @@ def main(modelfile):
 
     print('Elapsed time: %0.2fsec.' % (timeit.default_timer() - start))
 
-    AUCs = [roc_auc_score(y_true[:, i], pred[:, i]) if y_true[:, i].sum() > 0 else np.nan for i in range(N_CLASSES)]
-    print('The average AUC is %6.3f' % np.mean(AUCs))
-    for i in range(N_CLASSES):
-        print('The AUC of %s is %6.3f' % (CLASS_NAMES[i], AUCs[i]))
+    aucs = [roc_auc_score(y_true[:, i], pred[:, i]) if y_true[:, i].sum() > 0 else np.nan for i in range(N_CLASSES)]
+    auc_classes = ' '.join(['%5.3f' % (aucs[i]) for i in range(N_CLASSES)])
+    print(' average AUC %5.3f (%s)' % (np.mean(aucs), auc_classes), end='')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
