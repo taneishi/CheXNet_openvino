@@ -94,11 +94,11 @@ def main(modelfile):
 
     y_pred = torch.cat(y_pred, 0)
 
-    print('Elapsed time: %0.2fsec.' % (timeit.default_timer() - start))
+    print('Elapsed time: %0.2fsec.' % (timeit.default_timer() - start), end='')
 
-    aucs = [roc_auc_score(y_true[:, i], pred[:, i]) if y_true[:, i].sum() > 0 else np.nan for i in range(N_CLASSES)]
+    aucs = [roc_auc_score(y_true[:, i], y_pred[:, i]) if y_true[:, i].sum() > 0 else np.nan for i in range(N_CLASSES)]
     auc_classes = ' '.join(['%5.3f' % (aucs[i]) for i in range(N_CLASSES)])
-    print(' average AUC %5.3f (%s)' % (np.mean(aucs), auc_classes), end='')
+    print(' average AUC %5.3f (%s)' % (np.mean(aucs), auc_classes))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
