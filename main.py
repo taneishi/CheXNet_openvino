@@ -15,6 +15,10 @@ def main(args):
         net.load_state_dict(torch.load('model/model.pth', map_location=torch.device('cpu')))
         print('model state has loaded')
 
+        if args.num_threads:
+            torch.set_num_threads(args.num_threads)
+        print('number of threads %d' % (torch.get_num_threads()))
+
     elif args.mode == 'fp32' or args.mode == 'int8':
         if args.mode == 'fp32':
             modelfile = 'densenet121.xml'
@@ -98,6 +102,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--mode', choices=['torch', 'fp32', 'int8'], default='torch', type=str)
+    parser.add_argument('--num_threads', default=None, type=int)
     parser.add_argument('--batch_size', default=10, type=int)
     parser.add_argument('--data_dir', default='images', type=str)
     parser.add_argument('--test_image_list', default='labels/test_list.txt', type=str)
