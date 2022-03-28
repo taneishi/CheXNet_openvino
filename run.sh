@@ -31,8 +31,6 @@ if [ ! -f model/chexnet-pytorch.xml ]; then
     cp $(ls results/chexnet_DefaultQuantization/*/optimized/* | tail -3) model
 fi
 
-bash batch_download.sh
-
 python main.py --mode torch --batch_size 10
 python main.py --mode fp32 --batch_size 10
 python main.py --mode int8 --batch_size 10
