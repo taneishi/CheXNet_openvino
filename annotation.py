@@ -1,7 +1,7 @@
-from accuracy_checker.annotation_converters.convert import main
-from accuracy_checker.annotation_converters.format_converter import FileBasedAnnotationConverter, ConverterReturn
-from accuracy_checker.representation import MultiLabelRecognitionAnnotation
-from accuracy_checker.config import PathField
+from openvino.tools.accuracy_checker.annotation_converters.convert import main
+from openvino.tools.accuracy_checker.annotation_converters.format_converter import FileBasedAnnotationConverter, ConverterReturn
+from openvino.tools.accuracy_checker.representation import MultiLabelRecognitionAnnotation
+from openvino.tools.accuracy_checker.config import PathField
 import os
 
 from main import CLASS_NAMES
