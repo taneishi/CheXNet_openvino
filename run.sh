@@ -11,7 +11,7 @@ fi
 pip install -r requirements.txt
 
 CPUS=2
-CORES=28
+CORES=24
 TOTAL_CORES=$((${CPUS}*${CORES}))
 
 echo "CPUS=${CPUS} CORES=${CORES} TOTAL_CORES=${TOTAL_CORES}"
