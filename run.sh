@@ -8,8 +8,6 @@ if [ ${PBS_O_WORKDIR} ]; then
     cd ${PBS_O_WORKDIR}
 fi
 
-pip install -r requirements.txt
-
 CPUS=2
 CORES=24
 TOTAL_CORES=$((${CPUS}*${CORES}))
@@ -17,6 +15,8 @@ TOTAL_CORES=$((${CPUS}*${CORES}))
 echo "CPUS=${CPUS} CORES=${CORES} TOTAL_CORES=${TOTAL_CORES}"
 export OMP_NUM_THREADS=${TOTAL_CORES}
 export KMP_SETTING="KMP_AFFINITY=granularity=fine,compact,1,0"
+
+pip install -r requirements.txt
 
 if [ ! -f model/densenet121.onnx ]; then
     rm -f model/*.xml
