@@ -6,7 +6,7 @@ Medical imaging is an indispensable technology for modern medicine, and the appl
 A typical example is image reading using medical images such as X-rays, CT, MRI, etc.
 By constructing a model that estimates the name of the disease and the location of the disease using convolutional networks (CNNs), etc., for medical images,
 it is expected to reduce the burden on the image reading physician, equalize the diagnostic criteria,
-and realize diagnosis that exceeds human capabilities, although diagnosis through reading is still the responsibility of the physician.
+and realize diagnosis that exceeds human capabilities, although diagnosis through reading is still the responsibility of the physicians.
 
 On the other hand, there are several challenges in deep learning for medical images. 
 One is the collection and labeling of medical images, which requires collecting as many images as necessary for training, 
@@ -47,10 +47,10 @@ First, run the script to download the dataset.
 bash batch_download.sh
 ```
 
-The next step is to set up a Python environment to optimize and quantize the model. This procedure is described in `run.sh`.
+The next step is to install Python modele dependencies to optimize and quantize the model.
 
 ```bash
-bash run.sh
+pip install -r requirements.txt
 ```
 
 The following scripts are used to perform inference on the PyTorch, FP32 optimized and INT8 quantized models, respectively.
@@ -59,6 +59,12 @@ The following scripts are used to perform inference on the PyTorch, FP32 optimiz
 python main.py --mode torch
 python main.py --mode fp32
 python main.py --mode int8
+```
+
+The following script summerizes the above operations.
+
+```bash
+bash run.sh
 ```
 
 ## Results

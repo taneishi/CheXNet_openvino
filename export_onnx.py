@@ -8,20 +8,20 @@ def main(args):
     device = torch.device('cpu')
 
     # initialize and load the model
-    model = DenseNet121(N_CLASSES)
+    net = DenseNet121(N_CLASSES)
 
     if os.path.isfile(args.model_path):
-        model.load_state_dict(torch.load(args.model_path, map_location=device))
+        net.load_state_dict(torch.load(args.model_path, map_location=device))
         print('model state has loaded')
     else:
         print('=> model state file not found')
 
-    model.train(False)
+    net.train(False)
 
     dummy_input = torch.randn(args.batch_size, 3, 224, 224)
-    torch_out = model(dummy_input)
+    torch_out = net(dummy_input)
 
-    torch.onnx.export(model,
+    torch.onnx.export(net,
             dummy_input,
             'model/densenet121.onnx',
             verbose=False)
