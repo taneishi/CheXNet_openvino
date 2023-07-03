@@ -1,3 +1,0 @@
-openvino_dev
-torchvision
-onnx
